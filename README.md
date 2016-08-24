@@ -1,2 +1,2 @@
 # MarketTool
-Simple techinical analysis tool
+Simple technical analysis tool
