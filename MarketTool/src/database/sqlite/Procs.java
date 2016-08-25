@@ -2,6 +2,15 @@ package database.sqlite;
 
 public class Procs {
 	
+	public static final String I_LISTEDSTOCKS = "insert into LISTEDSTOCKS "
+			+ "(TICKER, "
+			+ "FULLNAME) "
+			+ "values (?, ?)";
+	
+	public static final String GET_ALL_LISTEDSTOCKS = "select TICKER, "
+			+ "FULLNAME "
+			+ "from LISTEDSTOCKS";
+	
 	public static final String I_PRICEHISTORY = "insert into PRICEHISTORY "
 			+ "(TICKER, "
 			+ "DATE, "

@@ -38,7 +38,7 @@ public class YahooDataRequest {
 			
 			URL l_url = null;
 			//l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s=WU&a=01&b=19&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
-			l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker +"&a=01&b=19&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
+			//l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker +"&a=01&b=19&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
 			//l_url = new URL("http://real-chart.finance.yahoo.com/table.csv?s=CSV&a=7&b=9&c=1996&d=7&e=13&f=2016&g=d&ignore=.csv");
 			l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker +"&a=01&b=01&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
 			
