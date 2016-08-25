@@ -1,10 +1,3 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -18,8 +11,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 
-import com.sun.javafx.binding.StringFormatter;
-
 import applicationConstants.StringConstants;
 import database.ConnectionPool;
 import database.sqlite.Procs;
@@ -28,10 +19,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.CacheHint;
 import javafx.scene.Scene;
-import javafx.scene.chart.Axis;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -40,11 +28,9 @@ import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import priceHistory.PriceChart;
 import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
 import utility.SystemInformationUtility;
-import view.viewEvents.WindowCloseEvent;
 import view.javaFXChart.DateAxis;
 import view.menuBar.TopMenuBar;
 
