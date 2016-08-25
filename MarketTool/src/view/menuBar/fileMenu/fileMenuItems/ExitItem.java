@@ -1,4 +1,4 @@
-package view.fileMenuItems;
+package view.menuBar.fileMenu.fileMenuItems;
 
 import applicationConstants.StringConstants;
 import javafx.application.Platform;
@@ -33,3 +33,4 @@ public class ExitItem extends MenuItem {
 	}
 
 }
+

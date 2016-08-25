@@ -44,9 +44,9 @@ import priceHistory.PriceChart;
 import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
 import utility.SystemInformationUtility;
-import view.TopMenu;
 import view.viewEvents.WindowCloseEvent;
 import view.javaFXChart.DateAxis;
+import view.menuBar.TopMenuBar;
 
 public class Root extends Application {
 	
@@ -66,7 +66,7 @@ public class Root extends Application {
 		root.setAlignment(Pos.TOP_CENTER);
 		Scene l_scene = new Scene(root);
 	
-		root.getChildren().addAll( new TopMenu( primaryStage ), tabPane );
+		root.getChildren().addAll( new TopMenuBar( primaryStage ), tabPane );
 		
 		final DateAxis xDateAxis = new DateAxis();
         final NumberAxis yPriceAxis = new NumberAxis();
