@@ -37,22 +37,37 @@ public class PriceHistoryView extends BorderPane {
 	public PriceHistoryView() {
 		super();
 		
+		createComponents();
+		layoutComponents();
+		
+		populateComponents();
+	}
+	
+	private void createComponents() {
+		createStockListView();
+		createPriceChart();
+	}
+	
+	private void populateComponents() {
+		ObservableList<ListedStockTO> observableList = FXCollections.observableArrayList( InitialListedStocks.listedStocks );
+		populateStockListView( observableList );
+		
+	}
+	
+	private void layoutComponents() {
+		super.setLeft( stockListView );
+		super.setCenter( stockPriceChart );
+	}
+	
+	private void createStockListView() {
 		stockListView = new ListView<ListedStockTO>();
 		stockListView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<ListedStockTO>() {
 			@Override
 			public void changed(ObservableValue<? extends ListedStockTO> observable, ListedStockTO oldValue, ListedStockTO newValue) {
-				
+				Series<Date, Number> closePriceSeries = getPriceChartData( newValue.getTicker() );
+				populateStockPriceChart( closePriceSeries );
 			}
 		});
-		super.setLeft( stockListView );
-		stockPriceChart = createPriceChart();
-		super.setCenter( stockPriceChart );
-		
-		ObservableList<ListedStockTO> observableList = FXCollections.observableArrayList(InitialListedStocks.listedStocks);
-		populateStockListView( observableList );
-		
-		Series<Date, Number> closePriceSeries = getPriceChartData();
-		populateStockPriceChart( closePriceSeries );
 	}
 	
 	private void populateStockListView( ObservableList<ListedStockTO> p_observableList ) {
@@ -64,12 +79,13 @@ public class PriceHistoryView extends BorderPane {
 		final DateAxis xDateAxis = new DateAxis();
         final NumberAxis yPriceAxis = new NumberAxis();
         yPriceAxis.setForceZeroInRange(false);
-		final LineChart<Date,Number> lineChart = new LineChart(xDateAxis,yPriceAxis);
+        
+        stockPriceChart = new LineChart(xDateAxis,yPriceAxis);
 		
-		lineChart.setAnimated(false);
-		lineChart.setCreateSymbols(false);
+        stockPriceChart.setAnimated(false);
+        stockPriceChart.setCreateSymbols(false);
 		
-		return lineChart;
+		return stockPriceChart;
 	}
 	
 	private void populateStockPriceChart( Series<Date, Number> p_stockPriceData ){
@@ -77,7 +93,12 @@ public class PriceHistoryView extends BorderPane {
 		stockPriceChart.getData().add(p_stockPriceData);
 	}
 	
-	private XYChart.Series<Date, Number> getPriceChartData() {
+	/**
+	 * 
+	 * @param p_ticker ticker of stock
+	 * @return
+	 */
+	private XYChart.Series<Date, Number> getPriceChartData( String p_ticker ) {
 		
 		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
 		
@@ -94,7 +115,7 @@ public class PriceHistoryView extends BorderPane {
 			try {
 				PreparedStatement preparedStatement = connection.prepareStatement( Procs.S_PRICEHISTORY );
 				
-				preparedStatement.setString( 1, "IBM" );
+				preparedStatement.setString( 1, p_ticker );
 				preparedStatement.setString( 2, "2011-02-02" );
 				preparedStatement.setString( 3, "2012-08-03" );
 				
