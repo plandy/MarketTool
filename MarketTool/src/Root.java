@@ -11,11 +11,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 
+import applicationConstants.InitialListedStocks;
 import applicationConstants.StringConstants;
 import database.ConnectionPool;
 import database.sqlite.Procs;
 import database.sqlite.Tables;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -25,9 +28,13 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import priceHistory.ListedStockTO;
+import priceHistory.PriceHistoryView;
 import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
 import utility.SystemInformationUtility;
@@ -46,103 +53,19 @@ public class Root extends Application {
 		primaryStage.setTitle( StringConstants.APPLICATION_TITLE );
 		initializeApplicationWindow( primaryStage );
 		
-		TabPane tabPane = new TabPane();
-		
 		final VBox root = new VBox();
 		root.setAlignment(Pos.TOP_CENTER);
 		Scene l_scene = new Scene(root);
 	
-		root.getChildren().addAll( new TopMenuBar( primaryStage ), tabPane );
-		
-		final DateAxis xDateAxis = new DateAxis();
-        final NumberAxis yPriceAxis = new NumberAxis();
-        yPriceAxis.setForceZeroInRange(false);
-		final LineChart<Date,Number> lineChart = new LineChart(xDateAxis,yPriceAxis);
-		
-		Series<Date, Number> closePriceSeries = getPriceChartData();
-		lineChart.getData().add(closePriceSeries);
-		lineChart.setAnimated(false);
-		lineChart.setCreateSymbols(false);
-		
-		root.getChildren().add(lineChart);
+		root.getChildren().addAll( new TopMenuBar( primaryStage ) );
+		root.getChildren().add( new PriceHistoryView() );
 		
 		primaryStage.setScene( l_scene );
 		primaryStage.setMaximized(true);
 		primaryStage.show();
 		
 //		primaryStage.setOnCloseRequest(new windowCloseEvent());
-
 		
-	}
-	
-	private XYChart.Series<Date, Number> getPriceChartData() {
-		
-		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
-		
-		ConnectionPool pool = new ConnectionPool(1,1);
-		Connection connection = null;
-		try {
-			connection = pool.requestConnection();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		if ( connection != null ) {
-			try {
-				PreparedStatement preparedStatement = connection.prepareStatement( Procs.S_PRICEHISTORY );
-				
-				preparedStatement.setString( 1, "IBM" );
-				preparedStatement.setString( 2, "2011-02-02" );
-				preparedStatement.setString( 3, "2012-08-03" );
-				
-				Instant start = Instant.now();
-				
-				ResultSet results = preparedStatement.executeQuery();
-				Instant mid = Instant.now();
-				System.out.println("Db query duration: " +  Duration.between(start, mid).getNano() );
-				
-				ArrayList<DataFeedTO> list = new ArrayList<DataFeedTO>();
-				ObservableList<DataFeedTO> l_priceHistory = FXCollections.observableList( list );
-				
-				DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
-				
-				while ( results.next() ) {
-					DataFeedTO dataTO = new DataFeedTO();
-					
-					dataTO.setTicker( results.getString("TICKER") );
-					dataTO.setDate( results.getString("DATE") );
-					dataTO.setOpenPrice( results.getBigDecimal("OPENPRICE") );
-					dataTO.setHighPrice( results.getBigDecimal("HIGHPRICE") );
-					dataTO.setLowPrice( results.getBigDecimal("LOWPRICE") );
-					dataTO.setClosePrice( results.getBigDecimal("CLOSEPRICE") );
-					dataTO.setVolume( results.getInt("VOLUME") );
-					
-//					dataTO.setTicker( results.getString(1) );
-//					dataTO.setDate( results.getString(2) );
-//					dataTO.setOpenPrice( results.getBigDecimal(3) );
-//					dataTO.setHighPrice( results.getBigDecimal(4) );
-//					dataTO.setLowPrice( results.getBigDecimal(5) );
-//					dataTO.setClosePrice( results.getBigDecimal(6) );
-//					dataTO.setVolume( results.getInt(7) );
-					
-					Data<Date, Number> data = new XYChart.Data( dateFormat.parse(results.getString("DATE")), (Number)results.getBigDecimal("CLOSEPRICE") );
-					
-					closePriceSeries.getData().add( data );
-				}
-				
-				Instant end = Instant.now();
-				System.out.println("Data parse duration: " +  Duration.between(mid, end).getNano() );		
-								
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return closePriceSeries;
 	}
 	
 	private void getInsert() {
