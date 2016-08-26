@@ -7,4 +7,6 @@ public class StringConstants {
 	public static final String FILE_MENU_TITLE = "File";
 	public static final String WINDOW_CLOSE_DIALOG = "Are you sure you want to exit?";
 	
+	public static final String DATE_FORMAT = "yyyy-MM-dd";
+	
 }

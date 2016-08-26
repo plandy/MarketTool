@@ -5,9 +5,18 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
+
+import applicationConstants.StringConstants;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import priceHistory.dataFeed.DataFeedTO;
@@ -18,12 +27,28 @@ public class YahooDataRequest {
 	
 	/** return format of yahoo finance request:
 	 *  <br> Date,Open,High,Low,Close,Volume,Adj Close
-		<br> 2013-02-19,14.45,14.47,14.19,14.25,10895700,12.780314  */
+		<br> 2013-02-19,14.45,14.47,14.19,14.25,10895700,12.780314
+		<p>
+	*	<br> example URL format:
+	*	<br> http://ichart.finance.yahoo.com/table.csv?s=IBM&a=01&b=01&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv
+	*	<br> a=begin month, b=begin day, c=begin year; d,e,f are the end date components
+	*
+	*/
 	public YahooDataRequest( String p_ticker ) {
+		
+		Date l_todayDate = Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("America/New_York")).toInstant() );
+		Date l_beginDate = null;
+		
+		String l_beginDateString = "2011-01-01";
+		try {
+			l_beginDate = new SimpleDateFormat( StringConstants.DATE_FORMAT ).parse(l_beginDateString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		
 		Instant start = Instant.now();
 		
-		InputStreamReader l_reader = dataRequest( p_ticker );
+		InputStreamReader l_reader = dataRequest( p_ticker, l_beginDate, l_todayDate );
 		readData( l_reader, p_ticker );
 		
 		Instant end = Instant.now();
@@ -32,15 +57,52 @@ public class YahooDataRequest {
 		
 	}
 	
-	public InputStreamReader dataRequest( String p_ticker ){
+	public YahooDataRequest( String p_ticker, Date p_beginDate ) {
+		
+		Date l_todayDate = Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("America/New_York")).toInstant() );
+		
+		Instant start = Instant.now();
+		
+		InputStreamReader l_reader = dataRequest( p_ticker, p_beginDate, l_todayDate );
+		readData( l_reader, p_ticker );
+		
+		Instant end = Instant.now();
+		
+		System.out.println( "Total data request duration: " + Duration.between(start, end).getNano() );
+		
+	}
+	
+	public YahooDataRequest( String p_ticker, Date p_beginDate, Date p_endDate ) {
+		
+		Instant start = Instant.now();
+		
+		InputStreamReader l_reader = dataRequest( p_ticker, p_beginDate, p_endDate );
+		readData( l_reader, p_ticker );
+		
+		Instant end = Instant.now();
+		
+		System.out.println( "Total data request duration: " + Duration.between(start, end).getNano() );
+		
+	}
+	
+	private InputStreamReader dataRequest( String p_ticker, Date p_beginDate, Date p_endDate ){
+		
+		String[] dateTokens = dateTokenizer( p_beginDate );
+		String beginDateURL = "&a="+dateTokens[1]+"&b="+dateTokens[2]+"&c="+dateTokens[0];
+		
+		dateTokens = dateTokenizer( p_endDate );
+		String endDateURL = "&d="+dateTokens[1]+"&e="+dateTokens[2]+"&f="+dateTokens[0];
 		
 		try{
 			
+			/**
+			 * example url: l_url = 
+			  		new URL("http://ichart.finance.yahoo.com/table.csv?s=IBM&a=01&b=21&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
+			 * 
+			 */
+
 			URL l_url = null;
-			//l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s=WU&a=01&b=19&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
-			//l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker +"&a=01&b=19&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
-			//l_url = new URL("http://real-chart.finance.yahoo.com/table.csv?s=CSV&a=7&b=9&c=1996&d=7&e=13&f=2016&g=d&ignore=.csv");
-			l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker +"&a=01&b=01&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
+			l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker + beginDateURL+ endDateURL +"g=d&ignore=.csv");
 			
 			Instant start = Instant.now();
 			
@@ -60,7 +122,7 @@ public class YahooDataRequest {
 		
 	}
 	
-	public void readData( InputStreamReader p_inputStream, String p_ticker ){
+	private void readData( InputStreamReader p_inputStream, String p_ticker ){
 		
 		ArrayList<DataFeedTO> list = new ArrayList<DataFeedTO>();
 		ObservableList<DataFeedTO> l_priceHistory = FXCollections.observableList( list );
@@ -114,8 +176,15 @@ public class YahooDataRequest {
 		return priceHistory;
 	}
 
-	public void setPriceHistory(ObservableList<DataFeedTO> priceHistory) {
+	private void setPriceHistory (ObservableList<DataFeedTO> priceHistory) {
 		this.priceHistory = priceHistory;
+	}
+	
+	private String[] dateTokenizer( Date p_date ) {
+		String beginDateString = new SimpleDateFormat( StringConstants.DATE_FORMAT ).format( p_date );
+		String[] tokens = beginDateString.split("-");
+		
+		return tokens;
 	}
 
 }

@@ -1,7 +1,6 @@
 package priceHistory;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,9 +9,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 
 import applicationConstants.InitialListedStocks;
+import applicationConstants.StringConstants;
 import database.ConnectionPool;
 import database.sqlite.Procs;
 import javafx.beans.value.ChangeListener;
@@ -27,6 +31,7 @@ import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import priceHistory.dataFeed.DataFeedTO;
+import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
 import view.javaFXChart.DateAxis;
 
 public class PriceHistoryView extends BorderPane {
@@ -102,6 +107,12 @@ public class PriceHistoryView extends BorderPane {
 		
 		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
 		
+		DateFormat dateFormat = new SimpleDateFormat( StringConstants.DATE_FORMAT );
+		
+		Date l_mostRecentDate = new Date(0);
+		Date l_thisDate;
+		Date l_todayDate = Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("America/New_York")).toInstant() );
+		
 		ConnectionPool pool = new ConnectionPool(1,1);
 		Connection connection = null;
 		try {
@@ -128,8 +139,6 @@ public class PriceHistoryView extends BorderPane {
 				ArrayList<DataFeedTO> list = new ArrayList<DataFeedTO>();
 				ObservableList<DataFeedTO> l_priceHistory = FXCollections.observableList( list );
 				
-				DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
-				
 				while ( results.next() ) {
 					DataFeedTO dataTO = new DataFeedTO();
 					
@@ -149,13 +158,18 @@ public class PriceHistoryView extends BorderPane {
 //					dataTO.setClosePrice( results.getBigDecimal(6) );
 //					dataTO.setVolume( results.getInt(7) );
 					
-					Data<Date, Number> data = new XYChart.Data( dateFormat.parse(results.getString("DATE")), (Number)results.getBigDecimal("CLOSEPRICE") );
+					l_thisDate = dateFormat.parse(results.getString("DATE"));
+					Data<Date, Number> data = new XYChart.Data( l_thisDate, (Number)results.getBigDecimal("CLOSEPRICE") );
 					
 					closePriceSeries.getData().add( data );
+					
+					if ( l_thisDate.after(l_mostRecentDate) ) {
+						l_mostRecentDate = l_thisDate;
+					}
 				}
 				
 				Instant end = Instant.now();
-				System.out.println("Data parse duration: " +  Duration.between(mid, end).getNano() );		
+				System.out.println("Data parse duration: " +  Duration.between(mid, end).getNano() );
 								
 				
 			} catch (SQLException e) {
@@ -163,6 +177,11 @@ public class PriceHistoryView extends BorderPane {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
+		}
+		
+		if ( l_todayDate.after(l_mostRecentDate) ) {
+			YahooDataRequest l_rr = new YahooDataRequest( "IBM", l_mostRecentDate );
+			ObservableList<DataFeedTO> l_priceHistory = l_rr.getPriceHistory();
 		}
 		
 		return closePriceSeries;
