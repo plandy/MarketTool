@@ -34,6 +34,26 @@ public class PoolableConnection implements Connection {
 	public void returnToPool() {
 		pool.returnConnection( this );
 	}
+	
+	public void silentRollback() {
+		try {
+			rollback();
+		} catch (SQLException e) {
+			throw new RuntimeException("Database rollback failure");
+		}
+	}
+	
+	/**
+	 * Actually close the connection.
+	 * Should only be done by the parent pool.
+	 */
+	void destroy() {
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			throw new RuntimeException("error destroying connection");
+		}
+	}
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {

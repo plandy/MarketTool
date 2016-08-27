@@ -24,9 +24,17 @@ public class ConnectionPool {
 		for ( int count = 0; count < p_initialPoolSize; count++ ) {
 			addConnection();
 		}
-		
 	}
 	
+	/**
+	 * Request a connection from the pool.
+	 * <p>
+	 * If an idling connection exists, return this. If no idle connection, the pool creates a new connection and returns it.
+	 * 
+	 * @return
+	 * @throws InterruptedException
+	 */
+	//TODO handle Case: no idle connections and pool already at max capacity.
 	public PoolableConnection requestConnection() throws InterruptedException {
 		
 		PoolableConnection connection = null;
@@ -41,9 +49,7 @@ public class ConnectionPool {
 				}
 			}
 		}
-		
 		return connection;
-		
 	}
 	
 	private void addConnection() {
@@ -52,13 +58,25 @@ public class ConnectionPool {
 			connectionPool.offer( new PoolableConnection( l_connection, this ) );
 			currentPoolSize.incrementAndGet();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RuntimeException("error creating database connection");
 		}
 		
 	}
 	
-	public void returnConnection( PoolableConnection p_connection ) {
+	/**
+	 * Return the connection to this pool.
+	 * <br>
+	 * Should only be called from a connection, and should have package access only or any connection could be returned to any pool.
+	 * 
+	 * @param p_connection the connection to return.
+	 */
+	void returnConnection( PoolableConnection p_connection ) {
 		connectionPool.add(p_connection);
+	}
+	
+	public void closeConnection ( PoolableConnection p_connection ) {
+		p_connection.destroy();
+		currentPoolSize.decrementAndGet();
 	}
 	
 }
