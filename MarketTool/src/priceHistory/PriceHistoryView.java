@@ -170,7 +170,6 @@ public class PriceHistoryView extends BorderPane {
 				
 				Instant end = Instant.now();
 				System.out.println("Data parse duration: " +  Duration.between(mid, end).getNano() );
-								
 				
 			} catch (SQLException e) {
 				e.printStackTrace();
