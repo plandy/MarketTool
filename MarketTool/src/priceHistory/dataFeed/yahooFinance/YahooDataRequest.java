@@ -95,11 +95,11 @@ public class YahooDataRequest {
 		
 		try{
 			
-			/**
-			 * example url: l_url = 
-			  		new URL("http://ichart.finance.yahoo.com/table.csv?s=IBM&a=01&b=21&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
-			 * 
-			 */
+//			/**
+//			 * example url: l_url = 
+//			  		new URL("http://ichart.finance.yahoo.com/table.csv?s=IBM&a=01&b=21&c=2010&d=01&e=19&f=2016&g=d&ignore=.csv");
+//			 * 
+//			 */
 
 			URL l_url = null;
 			l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker + beginDateURL+ endDateURL +"g=d&ignore=.csv");
@@ -143,11 +143,6 @@ public class YahooDataRequest {
 				String[] values = line1.split(",");
 				
 				DataFeedTO dataObject = new DataFeedTO();
-				
-				//DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
-				//dataObject.setDate( dateFormat.parse(values[0]) );
-				
-				//System.out.println( dataObject.getDate() );
 				
 				dataObject.setTicker( p_ticker );
 				dataObject.setDate( values[0] );

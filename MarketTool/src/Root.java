@@ -113,9 +113,7 @@ public class Root extends Application {
 				int[] results = preparedStatement.executeBatch();
 				
 				Instant end = Instant.now();
-				
 				System.out.println("Data insert duration: " + Duration.between(start, end).getNano());
-				
 				//System.out.println("Number of rows inserted : " + results[0]);
 				
 				connection.commit();
@@ -179,7 +177,5 @@ public class Root extends Application {
 		}
 		int[] results = prepstatement.executeBatch();
 	}
-	
-	
 	
 }
