@@ -47,7 +47,7 @@ public class PoolableConnection implements Connection {
 	 * Actually close the connection.
 	 * Should only be done by the parent pool.
 	 */
-	void destroy() {
+	protected void destroy() {
 		try {
 			connection.close();
 		} catch (SQLException e) {

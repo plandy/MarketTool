@@ -70,11 +70,11 @@ public class ConnectionPool {
 	 * 
 	 * @param p_connection the connection to return.
 	 */
-	void returnConnection( PoolableConnection p_connection ) {
+	protected void returnConnection( PoolableConnection p_connection ) {
 		connectionPool.add(p_connection);
 	}
 	
-	public void closeConnection ( PoolableConnection p_connection ) {
+	private void closeConnection ( PoolableConnection p_connection ) {
 		p_connection.destroy();
 		currentPoolSize.decrementAndGet();
 	}
