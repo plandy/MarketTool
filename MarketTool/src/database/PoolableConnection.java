@@ -38,6 +38,7 @@ public class PoolableConnection implements Connection {
 	public void silentRollback() {
 		try {
 			rollback();
+			System.out.println("rollback");
 		} catch (SQLException e) {
 			throw new RuntimeException("Database rollback failure");
 		}

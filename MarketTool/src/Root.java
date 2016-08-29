@@ -69,68 +69,6 @@ public class Root extends Application {
 		
 	}
 	
-	private void getInsert() {
-		ConnectionPool pool = new ConnectionPool(1,1);
-		Connection connection = null;
-		try {
-			connection = pool.requestConnection();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		if ( connection != null ) {
-			YahooDataRequest l_rr = new YahooDataRequest( "IBM" );
-			ObservableList<DataFeedTO> priceHistory = l_rr.getPriceHistory();
-			
-			try {
-				connection.setAutoCommit(false);
-				
-				Instant start = Instant.now();
-				
-				Statement statement = connection.createStatement();
-				
-				statement.execute( Tables.DROP_PRICEHISTORY );
-				statement.execute( Tables.CREATE_PRICEHISTORY );
-				
-				PreparedStatement preparedStatement = connection.prepareStatement( Procs.I_PRICEHISTORY );
-				
-				for ( DataFeedTO dataTO : priceHistory ) {
-					
-					//preparedStatement.setDate(1, new java.sql.Date(dataTO.getDate().getTime()) );
-					preparedStatement.setString(1, "IBM" );
-					preparedStatement.setString(2, dataTO.getDate() );
-					preparedStatement.setBigDecimal(3, dataTO.getOpenPrice());
-					preparedStatement.setBigDecimal(4, dataTO.getHighPrice());
-					preparedStatement.setBigDecimal(5, dataTO.getLowPrice());
-					preparedStatement.setBigDecimal(6, dataTO.getClosePrice());
-					preparedStatement.setInt(7, dataTO.getVolume());
-					
-					preparedStatement.addBatch();
-					
-				}
-				
-				int[] results = preparedStatement.executeBatch();
-				
-				Instant end = Instant.now();
-				System.out.println("Data insert duration: " + Duration.between(start, end).getNano());
-				//System.out.println("Number of rows inserted : " + results[0]);
-				
-				connection.commit();
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-				
-				try {
-					connection.rollback();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		}
-	}
-	
 	private void initializeApplicationWindow( Stage primaryStage ) {
 		
 		//set window to the size of the currently focused monitor
@@ -139,6 +77,20 @@ public class Root extends Application {
 		primaryStage.setWidth( l_screenWidth );
 		primaryStage.setHeight( l_screenHeight );
 		
+	}
+	
+	private void initialDBFunction() {
+		ConnectionPool pool = new ConnectionPool(1,1);
+		PoolableConnection poolableConnection = null;
+		try {
+			poolableConnection = pool.requestConnection();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if ( poolableConnection != null ) {
+			initialiseDatabase( poolableConnection );
+		}
 	}
 	
 	private void initialiseDatabase( PoolableConnection p_connection ) {
@@ -151,8 +103,6 @@ public class Root extends Application {
 			
 			p_connection.commit();
 		} catch (SQLException e) {
-			throw new RuntimeException("failed to initialise database");
-		} finally {
 			p_connection.silentRollback();
 		}
 	}

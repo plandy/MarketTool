@@ -60,7 +60,6 @@ public class ConnectionPool {
 		} catch (SQLException e) {
 			throw new RuntimeException("error creating database connection");
 		}
-		
 	}
 	
 	/**

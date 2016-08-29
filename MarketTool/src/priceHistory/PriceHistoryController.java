@@ -17,12 +17,13 @@ public class PriceHistoryController {
 	}
 	
 	public XYChart.Series<Date, Number> getPriceChartData( String p_ticker ) {
-		
 		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
 		
-		Date l_thisDate;
+		Date todayDate = DateUtility.getTodayDate();
+		Date beginDate = DateUtility.parseStringToDate("2015-08-29");
 		
-		List<DataFeedTO> priceHistory = service.getPriceChartData( p_ticker, null, null );
+		List<DataFeedTO> priceHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
+		Date l_thisDate;
 		
 		for ( DataFeedTO dataTO : priceHistory ) {
 			l_thisDate = DateUtility.parseStringToDate( dataTO.getDate() );

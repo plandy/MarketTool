@@ -1,8 +1,11 @@
 package priceHistory.dataFeed.yahooFinance;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
@@ -15,15 +18,17 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import applicationConstants.StringConstants;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import priceHistory.dataFeed.DataFeedTO;
+import utility.DateUtility;
 
 public class YahooDataRequest {
 	
-	private ObservableList<DataFeedTO> priceHistory;
+	private List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>();
 	
 	/** return format of yahoo finance request:
 	 *  <br> Date,Open,High,Low,Close,Volume,Adj Close
@@ -36,15 +41,11 @@ public class YahooDataRequest {
 	*/
 	public YahooDataRequest( String p_ticker ) {
 		
-		Date l_todayDate = Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("America/New_York")).toInstant() );
+		Date l_todayDate = DateUtility.getTodayDate();
 		Date l_beginDate = null;
 		
 		String l_beginDateString = "2011-01-01";
-		try {
-			l_beginDate = new SimpleDateFormat( StringConstants.DATE_FORMAT ).parse(l_beginDateString);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		l_beginDate = DateUtility.parseStringToDate( l_beginDateString );
 		
 		Instant start = Instant.now();
 		
@@ -85,8 +86,18 @@ public class YahooDataRequest {
 		
 	}
 	
+	/**
+	 * 
+	 * Possible FileNotFound Exception: example: if most recent request was friday, and today is sunday, no 
+	 * data will exist for saturday since there is no trading, and no file will be returned.
+	 * 
+	 * @param p_ticker
+	 * @param p_beginDate
+	 * @param p_endDate
+	 * @return
+	 */
 	private InputStreamReader dataRequest( String p_ticker, Date p_beginDate, Date p_endDate ){
-		
+				
 		String[] dateTokens = dateTokenizer( p_beginDate );
 		String beginDateURL = "&a="+dateTokens[1]+"&b="+dateTokens[2]+"&c="+dateTokens[0];
 		
@@ -104,28 +115,33 @@ public class YahooDataRequest {
 			URL l_url = null;
 			l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker + beginDateURL+ endDateURL +"g=d&ignore=.csv");
 			
+			System.out.println("Yahoo Data request: " + p_ticker + DateUtility.parseDateToString( p_beginDate ) + DateUtility.parseDateToString( p_endDate ) );
 			Instant start = Instant.now();
 			
 			URLConnection l_connection = l_url.openConnection();
-			InputStreamReader l_stream = new InputStreamReader(l_connection.getInputStream());
+			InputStreamReader l_stream = new InputStreamReader( l_connection.getInputStream() );
 			
 			Instant end = Instant.now();
 			System.out.println("Connection establish duration: " + Duration.between(start, end).getNano());
 			
 			return l_stream;
 			
-		} catch ( Exception e ) {
+		} catch ( FileNotFoundException e ) {
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return null;
-		
+		return null;	
 	}
 	
 	private void readData( InputStreamReader p_inputStream, String p_ticker ){
+		if ( p_inputStream == null ) {
+			return;
+		}
 		
-		ArrayList<DataFeedTO> list = new ArrayList<DataFeedTO>();
-		ObservableList<DataFeedTO> l_priceHistory = FXCollections.observableList( list );
+		List<DataFeedTO> l_priceHistory = new ArrayList<DataFeedTO>();
 		
 		try {
 			
@@ -167,17 +183,24 @@ public class YahooDataRequest {
 			
 	}
 
-	public ObservableList<DataFeedTO> getPriceHistory() {
+	public List<DataFeedTO> getPriceHistory() {
 		return priceHistory;
 	}
 
-	private void setPriceHistory (ObservableList<DataFeedTO> priceHistory) {
+	private void setPriceHistory (List<DataFeedTO> priceHistory) {
 		this.priceHistory = priceHistory;
 	}
 	
+	/**
+	 * first formats the input date. Then parse date to string.
+	 * 
+	 * @param p_date
+	 * @return
+	 */
 	private String[] dateTokenizer( Date p_date ) {
-		String beginDateString = new SimpleDateFormat( StringConstants.DATE_FORMAT ).format( p_date );
-		String[] tokens = beginDateString.split("-");
+		
+		String beginDateString = DateUtility.parseDateToString( p_date );
+		String[] tokens = beginDateString.split( "-" );
 		
 		return tokens;
 	}
