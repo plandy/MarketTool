@@ -116,6 +116,7 @@ public enum PriceHistoryService {
 			} catch ( SQLException e ) {
 				throw new RuntimeException();
 			}
+			
 		}
 		
 		return new Pair( l_priceHistory, l_mostRecentDate );
@@ -137,7 +138,7 @@ public enum PriceHistoryService {
 		}
 		if ( poolableConnection != null ) {
 			try {
-				poolableConnection.setAutoCommit(false);
+				poolableConnection.beginTransaction();
 				
 				PreparedStatement preparedStatement = poolableConnection.prepareStatement( Procs.I_PRICEHISTORY );
 				
@@ -157,10 +158,11 @@ public enum PriceHistoryService {
 				
 				int[] results = preparedStatement.executeBatch();
 				
-				poolableConnection.commit();
+				poolableConnection.commitTransaction();
 				
 			} catch (SQLException e) {
 				poolableConnection.silentRollback();
+				e.printStackTrace();
 			}
 		}
 	}

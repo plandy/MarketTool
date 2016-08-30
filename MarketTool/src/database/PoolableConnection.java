@@ -38,7 +38,7 @@ public class PoolableConnection implements Connection {
 	public void silentRollback() {
 		try {
 			rollback();
-			System.out.println("rollback");
+			System.out.println("silent rollback");
 		} catch (SQLException e) {
 			throw new RuntimeException("Database rollback failure");
 		}
@@ -53,6 +53,31 @@ public class PoolableConnection implements Connection {
 			connection.close();
 		} catch (SQLException e) {
 			throw new RuntimeException("error destroying connection");
+		}
+	}
+	
+	/**
+	 * Sets autoCommit(false) and does a rollback to ensure connection is clean.
+	 */
+	public void beginTransaction() {
+		try {
+			connection.setAutoCommit(false);
+			connection.rollback();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * attempts to commit transaction. Always does a rollback as final action.
+	 */
+	public void commitTransaction() {
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			silentRollback();
 		}
 	}
 
