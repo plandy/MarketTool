@@ -8,7 +8,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import database.ConnectionPool;
 import database.PoolableConnection;
@@ -21,6 +24,8 @@ import utility.DateUtility;
 public enum PriceHistoryService {
 	
 	INSTANCE;
+	
+	private ConcurrentHashMap<String, Boolean> priceHistoryDataRequestCache = new ConcurrentHashMap<String, Boolean>(20,0.75f,2);
 	
 	public List<DataFeedTO> getPriceChartData( String p_ticker, Date p_beginDate, Date p_endDate ) {
 		
@@ -66,19 +71,22 @@ public enum PriceHistoryService {
 						l_mostRecentDate = l_thisDate;
 					}
 				}
+				
 			} catch ( SQLException e ) {
 				throw new RuntimeException();
 				
 			}
 		}
 		
-		if ( l_mostRecentDate.before(l_todayDate) ) {
+		if ( l_mostRecentDate.before(l_todayDate) && !(priceHistoryDataRequestCache.containsKey("insertPrice"+p_ticker+DateUtility.parseDateToString(p_endDate))) ) {
 			YahooDataRequest l_rr = new YahooDataRequest( p_ticker, l_mostRecentDate );
 			List<DataFeedTO> l_missingHistory = l_rr.getPriceHistory();
 			
 			insertPriceHistory( p_ticker, l_missingHistory );
 			
 			l_priceHistory.addAll( l_missingHistory );
+			
+			priceHistoryDataRequestCache.putIfAbsent( "insertPrice"+p_ticker+DateUtility.parseDateToString(p_endDate), true );
 		}
 		
 		return l_priceHistory;
