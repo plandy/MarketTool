@@ -66,6 +66,11 @@ public enum PriceHistoryService {
 		
 	}
 	
+	/**
+	 * Currently using a Pair to return the priceHistory plus mostRecentDate. The date is used to determine whether
+	 * a dataRequest should be sent to retrieve up to date price information.
+	 * <p> Don't want to iterate over the priceHistory twice just to get the date.
+	 */
 	private Pair searchPriceHistoryHack( String p_ticker, Date p_beginDate, Date p_endDate ) {
 		
 		List<DataFeedTO> l_priceHistory = new ArrayList<DataFeedTO>(400);
