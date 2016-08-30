@@ -27,13 +27,49 @@ public enum PriceHistoryService {
 	
 	private ConcurrentHashMap<String, Boolean> priceHistoryDataRequestCache = new ConcurrentHashMap<String, Boolean>(20,0.75f,2);
 	
+	/**
+	 * used to return 2 objects from searchPriceHistory(). Find a nicer way of doing it.
+	 */
+	private class Pair{
+		public List<DataFeedTO> priceHistory;
+		public Date mostRecentDate;
+		
+		Pair( List<DataFeedTO> p_priceHistory, Date p_mostRecentDate ) {
+			priceHistory = p_priceHistory;
+			mostRecentDate = p_mostRecentDate;
+		}
+	}
+	
 	public List<DataFeedTO> getPriceChartData( String p_ticker, Date p_beginDate, Date p_endDate ) {
 		
 		List<DataFeedTO> l_priceHistory = new ArrayList<DataFeedTO>();
 		
-		Date l_mostRecentDate = new Date(0);
-		Date l_thisDate;
+		Date l_mostRecentDate;
 		Date l_todayDate = DateUtility.getTodayDate();
+		
+		Pair hack = searchPriceHistoryHack( p_ticker, p_beginDate, p_endDate );
+		l_priceHistory = hack.priceHistory;
+		l_mostRecentDate = hack.mostRecentDate;
+		
+		if ( l_mostRecentDate.before(l_todayDate) && !(priceHistoryDataRequestCache.containsKey("insertPrice"+p_ticker+DateUtility.parseDateToString(p_endDate))) ) {
+			YahooDataRequest l_rr = new YahooDataRequest( p_ticker, l_mostRecentDate );
+			List<DataFeedTO> l_missingHistory = l_rr.getPriceHistory();
+			
+			insertPriceHistory( p_ticker, l_missingHistory );
+			
+			l_priceHistory.addAll( l_missingHistory );
+			
+			priceHistoryDataRequestCache.putIfAbsent( "insertPrice"+p_ticker+DateUtility.parseDateToString(p_endDate), true );
+		}
+		
+		return l_priceHistory;
+		
+	}
+	
+	private Pair searchPriceHistoryHack( String p_ticker, Date p_beginDate, Date p_endDate ) {
+		
+		List<DataFeedTO> l_priceHistory = new ArrayList<DataFeedTO>(400);
+		Date l_mostRecentDate = new Date(0);
 		
 		ConnectionPool pool = new ConnectionPool(1,1);
 		PoolableConnection poolableConnection = null;
@@ -66,7 +102,7 @@ public enum PriceHistoryService {
 					
 					l_priceHistory.add( dataTO );
 					
-					l_thisDate = DateUtility.parseStringToDate( results.getString("DATE") );
+					Date l_thisDate = DateUtility.parseStringToDate( results.getString("DATE") );
 					if ( l_thisDate.after(l_mostRecentDate) ) {
 						l_mostRecentDate = l_thisDate;
 					}
@@ -74,23 +110,10 @@ public enum PriceHistoryService {
 				
 			} catch ( SQLException e ) {
 				throw new RuntimeException();
-				
 			}
 		}
 		
-		if ( l_mostRecentDate.before(l_todayDate) && !(priceHistoryDataRequestCache.containsKey("insertPrice"+p_ticker+DateUtility.parseDateToString(p_endDate))) ) {
-			YahooDataRequest l_rr = new YahooDataRequest( p_ticker, l_mostRecentDate );
-			List<DataFeedTO> l_missingHistory = l_rr.getPriceHistory();
-			
-			insertPriceHistory( p_ticker, l_missingHistory );
-			
-			l_priceHistory.addAll( l_missingHistory );
-			
-			priceHistoryDataRequestCache.putIfAbsent( "insertPrice"+p_ticker+DateUtility.parseDateToString(p_endDate), true );
-		}
-		
-		return l_priceHistory;
-		
+		return new Pair( l_priceHistory, l_mostRecentDate );
 	}
 	
 	private void insertPriceHistory( String p_ticker, List<DataFeedTO> p_priceHistory ) {
