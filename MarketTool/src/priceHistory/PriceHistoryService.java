@@ -74,7 +74,7 @@ public enum PriceHistoryService {
 	private Pair searchPriceHistoryHack( String p_ticker, Date p_beginDate, Date p_endDate ) {
 		
 		List<DataFeedTO> l_priceHistory = new ArrayList<DataFeedTO>(400);
-		Date l_mostRecentDate = new Date(0);
+		Date l_mostRecentDate = p_beginDate;
 		
 		ConnectionPool pool = new ConnectionPool(1,1);
 		PoolableConnection poolableConnection = null;
