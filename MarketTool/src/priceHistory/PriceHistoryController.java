@@ -34,5 +34,22 @@ public class PriceHistoryController {
 
 		return closePriceSeries;
 	}
+	
+	public XYChart.Series<String, Number> getVolumeChartData( String p_ticker ) {
+		XYChart.Series<String, Number> volumeSeries = new XYChart.Series<>();
+		
+		Date todayDate = DateUtility.getTodayDate();
+		Date beginDate = DateUtility.parseStringToDate("2015-08-29");
+		
+		List<DataFeedTO> priceHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
+		
+		for ( DataFeedTO dataTO : priceHistory ) {
+			Data<String, Number> data = new Data<String, Number>( dataTO.getDate(), (Number)(dataTO.getVolume()/100000) );
+			
+			volumeSeries.getData().add( data );
+		}
+
+		return volumeSeries;
+	}
 
 }
