@@ -38,7 +38,13 @@ public class PriceHistoryView extends BorderPane {
 		createComponents();
 		layoutComponents();
 		
-		populateComponents();
+		initialiseComponents();
+		
+		addListeners();
+	}
+	
+	private void addListeners() {
+		addStockListListeners();
 	}
 	
 	private void createComponents() {
@@ -48,7 +54,7 @@ public class PriceHistoryView extends BorderPane {
 		createStockVolumeChart();
 	}
 	
-	private void populateComponents() {
+	private void initialiseComponents() {
 		ObservableList<ListedStockTO> observableList = FXCollections.observableArrayList( InitialListedStocks.listedStocks );
 		populateStockListView( observableList );
 	}
@@ -56,27 +62,13 @@ public class PriceHistoryView extends BorderPane {
 	private void layoutComponents() {
 		super.setLeft( stockListView );
 		super.setCenter( chartAreaPane );
+		
 		chartAreaPane.add(stockPriceChart, 0, 0);
 		chartAreaPane.add(stockVolumeChart, 0, 1);
+		layoutChartAreaPane();
 	}
 	
-	private void createChartAreaPane() {
-		chartAreaPane = new GridPane();
-		chartAreaPane.setGridLinesVisible( false );
-		
-		ColumnConstraints col0Constraint = new ColumnConstraints();
-		col0Constraint.setHgrow(Priority.ALWAYS);
-		chartAreaPane.getColumnConstraints().add(0, col0Constraint);
-		RowConstraints row0Constraint = new RowConstraints();
-		row0Constraint.setPercentHeight(70);
-		chartAreaPane.getRowConstraints().add(0, row0Constraint);
-		RowConstraints row1Constraint = new RowConstraints();
-		row1Constraint.setPercentHeight(30);
-		chartAreaPane.getRowConstraints().add(1, row1Constraint);
-	}
-	
-	private void createStockListView() {
-		stockListView = new ListView<ListedStockTO>();
+	private void addStockListListeners() {
 		stockListView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<ListedStockTO>() {
 			@Override
 			public void changed(ObservableValue<? extends ListedStockTO> observable, ListedStockTO oldValue, ListedStockTO newValue) {
@@ -84,6 +76,29 @@ public class PriceHistoryView extends BorderPane {
 				populateStockVolumeChart( newValue.getTicker() );
 			}
 		});
+	}
+	
+	private void createChartAreaPane() {
+		chartAreaPane = new GridPane();
+		chartAreaPane.setGridLinesVisible( false );
+	}
+	
+	private void layoutChartAreaPane() {
+		ColumnConstraints col0Constraint = new ColumnConstraints();
+		col0Constraint.setHgrow(Priority.ALWAYS);
+		chartAreaPane.getColumnConstraints().add(0, col0Constraint);
+		
+		RowConstraints row0Constraint = new RowConstraints();
+		row0Constraint.setPercentHeight(70);
+		chartAreaPane.getRowConstraints().add(0, row0Constraint);
+		
+		RowConstraints row1Constraint = new RowConstraints();
+		row1Constraint.setPercentHeight(30);
+		chartAreaPane.getRowConstraints().add(1, row1Constraint);
+	}
+	
+	private void createStockListView() {
+		stockListView = new ListView<ListedStockTO>();
 	}
 	
 	private void populateStockListView( ObservableList<ListedStockTO> p_observableList ) {
