@@ -12,18 +12,22 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import view.javaFXChart.DateAxis;
 
 public class PriceHistoryView extends BorderPane {
 	
 	private ListView<ListedStockTO> stockListView;
+	
+	private GridPane chartAreaPane;
 	private LineChart<Date,Number> stockPriceChart;
 	private BarChart<String,Number> stockVolumeChart;
-	
-	private BorderPane chartAreaPane;
 	
 	private PriceHistoryController controller;
 	
@@ -52,12 +56,23 @@ public class PriceHistoryView extends BorderPane {
 	private void layoutComponents() {
 		super.setLeft( stockListView );
 		super.setCenter( chartAreaPane );
-		chartAreaPane.setCenter( stockPriceChart );
-		chartAreaPane.setBottom( stockVolumeChart );
+		chartAreaPane.add(stockPriceChart, 0, 0);
+		chartAreaPane.add(stockVolumeChart, 0, 1);
 	}
 	
 	private void createChartAreaPane() {
-		chartAreaPane = new BorderPane();
+		chartAreaPane = new GridPane();
+		chartAreaPane.setGridLinesVisible( false );
+		
+		ColumnConstraints col0Constraint = new ColumnConstraints();
+		col0Constraint.setHgrow(Priority.ALWAYS);
+		chartAreaPane.getColumnConstraints().add(0, col0Constraint);
+		RowConstraints row0Constraint = new RowConstraints();
+		row0Constraint.setPercentHeight(70);
+		chartAreaPane.getRowConstraints().add(0, row0Constraint);
+		RowConstraints row1Constraint = new RowConstraints();
+		row1Constraint.setPercentHeight(30);
+		chartAreaPane.getRowConstraints().add(1, row1Constraint);
 	}
 	
 	private void createStockListView() {
