@@ -3,6 +3,8 @@ package priceHistory;
 import java.util.Date;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import priceHistory.dataFeed.DataFeedTO;
@@ -50,6 +52,11 @@ public class PriceHistoryController {
 		}
 
 		return volumeSeries;
+	}
+	
+	public ObservableList<ListedStockTO> getListedStocks() {
+		List<ListedStockTO> listedStocks = service.getListedStocks();		
+		return FXCollections.observableArrayList( listedStocks );
 	}
 
 }

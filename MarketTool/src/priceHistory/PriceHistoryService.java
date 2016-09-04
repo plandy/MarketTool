@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import applicationConstants.InitialListedStocks;
 import database.ConnectionPool;
 import database.PoolableConnection;
 import database.sqlite.Procs;
@@ -159,6 +160,45 @@ public enum PriceHistoryService {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public List<ListedStockTO> getListedStocks() {
+		
+		List<ListedStockTO> listedStocks = new ArrayList<ListedStockTO>(40);
+		
+		ConnectionPool pool = new ConnectionPool(1,1);
+		PoolableConnection poolableConnection = null;
+		try {
+			poolableConnection = pool.requestConnection();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if ( poolableConnection != null ) {
+			try {
+				PreparedStatement preparedStatement = poolableConnection.prepareStatement( Procs.GET_ALL_LISTEDSTOCKS );
+				ResultSet results = preparedStatement.executeQuery();
+				
+				while ( results.next() ) {
+					ListedStockTO stockTO = new ListedStockTO( results.getString("TICKER"), results.getString("FULLNAME") );
+					listedStocks.add( stockTO );
+				}
+				
+			} catch ( SQLException e ) {
+				throw new RuntimeException();
+			}
+		}
+		
+		if ( listedStocks.isEmpty() ) {
+			listedStocks = getInitialListedStocks();
+		}
+		
+		return listedStocks;
+	}
+	
+	public List<ListedStockTO> getInitialListedStocks() {
+		return InitialListedStocks.listedStocks;
 	}
 
 }

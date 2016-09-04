@@ -57,7 +57,7 @@ public class PriceHistoryView extends BorderPane {
 	}
 	
 	private void initialiseComponents() {
-		ObservableList<ListedStockTO> observableList = FXCollections.observableArrayList( InitialListedStocks.listedStocks );
+		ObservableList<ListedStockTO> observableList = controller.getListedStocks();
 		populateStockListView( observableList );
 	}
 	
@@ -157,20 +157,20 @@ public class PriceHistoryView extends BorderPane {
 	}
 	
 	private void layoutChartAreaPane() {
-		chartAreaPane.add(stockPriceChart, 0, 0);
-		chartAreaPane.add(stockVolumeChart, 0, 1);
+		chartAreaPane.add( stockPriceChart, 0, 0 );
+		chartAreaPane.add( stockVolumeChart, 0, 1 );
 		
 		ColumnConstraints col0Constraint = new ColumnConstraints();
 		col0Constraint.setHgrow(Priority.ALWAYS);
-		chartAreaPane.getColumnConstraints().add(0, col0Constraint);
+		chartAreaPane.getColumnConstraints().add( 0, col0Constraint );
 		
 		RowConstraints row0Constraint = new RowConstraints();
 		row0Constraint.setPercentHeight(70);
-		chartAreaPane.getRowConstraints().add(0, row0Constraint);
+		chartAreaPane.getRowConstraints().add( 0, row0Constraint );
 		
 		RowConstraints row1Constraint = new RowConstraints();
 		row1Constraint.setPercentHeight(30);
-		chartAreaPane.getRowConstraints().add(1, row1Constraint);
+		chartAreaPane.getRowConstraints().add( 1, row1Constraint );
 	}
 	
 	private void createStockListView() {
