@@ -9,4 +9,8 @@ public class StringConstants {
 	
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	
+	public static final String PRICEHISTORYVIEW_ALLSTOCKS_TAB = "All stocks";
+	public static final String PRICEHISTORYVIEW_WATCHLIST_TAB = "Watchlist";
+	public static final String PRICEHISTORYVIEW_ADDTOWATCHLIST = "Add to watchlist";
+	
 }
