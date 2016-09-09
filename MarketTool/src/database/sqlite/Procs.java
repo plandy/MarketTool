@@ -35,5 +35,12 @@ public class Procs {
 			+ "order by DATE asc ";
 	
 	public static final String GET_MOSTRECENT_PRICEHISTORY_DATE = "select max(DATE) as DATE from PRICEHISTORY where TICKER = ? ";
+	
+	public static final String I_DATAREQUESTHISTORY = "insert into DATAREQUESTHISTORY "
+			+ "(TICKER, "
+			+ "REQUESTDATE) "
+			+ "values (?,?)";
+	
+	public static final String GET_MOSTRECENT_DATAREQUEST_DATE = "select max(REQUESTDATE) as REQUESTDATE from DATAREQUESTHISTORY where TICKER = ? ";
 
 }

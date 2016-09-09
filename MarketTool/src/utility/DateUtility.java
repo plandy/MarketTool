@@ -42,5 +42,23 @@ public final class DateUtility {
 	public static Date getTodayDate() {
 		return Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("America/New_York")).toInstant() );
 	}
+	
+	public static Boolean beforeCalendarDate( Date p_date1, Date p_date2 ) {
+		Boolean isBefore = false;
+		
+		Date truncatedDate1 = truncateTime( p_date1 );
+		Date truncatedDate2 = truncateTime( p_date2 );
+		
+		if ( truncatedDate1.before(truncatedDate2) ) {
+			isBefore = true;
+		}
+		
+		return isBefore;
+	}
+	
+	public static Date truncateTime( Date p_date ) {
+		Date truncatedDatetime = parseStringToDate( parseDateToString(p_date) );
+		return truncatedDatetime;
+	}
 
 }

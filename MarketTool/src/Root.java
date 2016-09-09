@@ -115,6 +115,9 @@ public class Root extends Application {
 		
 		statement.execute( Tables.DROP_PRICEHISTORY );
 		statement.execute( Tables.CREATE_PRICEHISTORY );
+		
+		statement.execute( Tables.DROP_DATAREQUESTHISTORY );
+		statement.execute( Tables.CREATE_DATAREQUESTHISTORY );
 	}
 	
 	private void insertInitialData( Connection p_connection ) throws SQLException {

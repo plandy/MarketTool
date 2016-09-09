@@ -19,4 +19,10 @@ public class Tables {
 			+ "VOLUME integer, "
 			+ "primary key(TICKER, DATE) )";
 	
+	public static final String DROP_DATAREQUESTHISTORY = "drop table if exists DATAREQUESTHISTORY ";
+	public static final String CREATE_DATAREQUESTHISTORY = "create table DATAREQUESTHISTORY "
+			+ "(TICKER string not null, "
+			+ "REQUESTDATE string not null, "
+			+ "primary key (TICKER, REQUESTDATE) )";
+	
 }

@@ -20,28 +20,61 @@ public enum PriceHistoryService {
 	
 	INSTANCE;
 	
-	private ConcurrentHashMap<String, Boolean> priceHistoryDataRequestCache = new ConcurrentHashMap<String, Boolean>(20,0.75f,2);
-	
 	public List<DataFeedTO> getPriceChartData( String p_ticker, Date p_beginDate, Date p_endDate ) {
 		
 		List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>();
 		priceHistory = searchPriceHistory( p_ticker, p_beginDate, p_endDate );
 		
-		String mostRecentDateString = getMostRecentPricehistoryDate( p_ticker );
-		Date mostRecentDate = DateUtility.parseStringToDate( mostRecentDateString );
+		String mostRecentPriceDateString = getMostRecentPricehistoryDate( p_ticker );
+		Date mostRecentPriceDate = DateUtility.parseStringToDate( mostRecentPriceDateString );
 		
 		Date l_todayDate = DateUtility.getTodayDate();
-		if ( mostRecentDate.before(l_todayDate) && !(priceHistoryDataRequestCache.containsKey("insertPrice"+p_ticker+DateUtility.parseDateToString(p_endDate))) ) {
-			YahooDataRequest l_rr = new YahooDataRequest( p_ticker, mostRecentDate );
+		
+		String mostRecentRequestDateString = getMostRecentRequestDate( p_ticker );
+		
+		if ( mostRecentPriceDate.before(l_todayDate) )
+			if ( mostRecentRequestDateString.isEmpty() || (!mostRecentRequestDateString.isEmpty() && DateUtility.beforeCalendarDate(DateUtility.parseStringToDate(mostRecentRequestDateString), l_todayDate)) ) {
+			YahooDataRequest l_rr = new YahooDataRequest( p_ticker, mostRecentPriceDate );
+			insertDataRequestHistory( p_ticker, l_todayDate );
 			List<DataFeedTO> missingHistory = l_rr.getPriceHistory();
 			insertPriceHistory( p_ticker, missingHistory );
 			priceHistory.addAll( missingHistory );
 			
-			priceHistoryDataRequestCache.putIfAbsent( "insertPrice"+p_ticker+DateUtility.parseDateToString(p_endDate), true );
 		}
 		
 		return priceHistory;
 		
+	}
+	
+	private String getMostRecentRequestDate( String p_ticker ) {
+		
+		String mostRecentDate = "";
+		
+		ConnectionPool pool = new ConnectionPool(1,1);
+		PoolableConnection poolableConnection = null;
+		try {
+			poolableConnection = pool.requestConnection();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if ( poolableConnection != null ) {
+			try {
+				PreparedStatement preparedStatement = poolableConnection.prepareStatement( Procs.GET_MOSTRECENT_DATAREQUEST_DATE );
+				preparedStatement.setString( 1, p_ticker );
+				
+				ResultSet results = preparedStatement.executeQuery();
+				
+				while ( results.next() ) {
+					mostRecentDate = results.getString("REQUESTDATE");
+				}
+			} catch ( SQLException e ) {
+				throw new RuntimeException();
+			}
+		}
+		
+		return mostRecentDate;
 	}
 	
 	private String getMostRecentPricehistoryDate( String p_ticker ) {
@@ -92,7 +125,7 @@ public enum PriceHistoryService {
 		
 		if ( poolableConnection != null ) {
 			try {
-				PreparedStatement preparedStatement = poolableConnection.prepareStatement(Procs.S_PRICEHISTORY);
+				PreparedStatement preparedStatement = poolableConnection.prepareStatement( Procs.S_PRICEHISTORY );
 				preparedStatement.setString( 1, p_ticker );
 				preparedStatement.setString( 2, DateUtility.parseDateToString(p_beginDate) );
 				preparedStatement.setString( 3, DateUtility.parseDateToString(p_endDate) );
@@ -204,6 +237,36 @@ public enum PriceHistoryService {
 	
 	public List<ListedStockTO> getInitialListedStocks() {
 		return InitialListedStocks.listedStocks;
+	}
+	
+	private void insertDataRequestHistory( String p_ticker, Date p_date ) {
+		ConnectionPool pool = new ConnectionPool(1,1);
+		PoolableConnection poolableConnection = null;
+		try {
+			poolableConnection = pool.requestConnection();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if ( poolableConnection != null ) {
+			try {
+				poolableConnection.beginTransaction();
+				
+				PreparedStatement preparedStatement = poolableConnection.prepareStatement( Procs.I_DATAREQUESTHISTORY );
+				
+				preparedStatement.setString(1, p_ticker );
+				preparedStatement.setString(2, DateUtility.parseDateToString(p_date) );
+				
+				preparedStatement.addBatch();
+				
+				int[] results = preparedStatement.executeBatch();
+				
+				poolableConnection.commitTransaction();
+			} catch (SQLException e) {
+				poolableConnection.silentRollback();
+			}
+		}
 	}
 
 }
