@@ -108,7 +108,9 @@ public class PriceHistoryView extends BorderPane {
 		stockListView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<ListedStockTO>() {
 			@Override
 			public void changed(ObservableValue<? extends ListedStockTO> observable, ListedStockTO oldValue, ListedStockTO newValue) {
-				controller.selectStock( newValue.getTicker() );
+				if ( newValue != null ) {
+					controller.selectStock( newValue.getTicker() );
+				}
 			}
 		});		
 
@@ -118,13 +120,24 @@ public class PriceHistoryView extends BorderPane {
 		stockWatchlistListView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<ListedStockTO>() {
 			@Override
 			public void changed(ObservableValue<? extends ListedStockTO> observable, ListedStockTO oldValue, ListedStockTO newValue) {
-				controller.selectStock( newValue.getTicker() );
+				if ( newValue != null ) {
+					controller.selectStock( newValue.getTicker() );
+				}
 			}
 		});	
 	}
 	
 	private void createStockListTabPane() {
 		stockListTabPane = new TabPane();
+		
+		stockListTabPane.getSelectionModel().selectedItemProperty().addListener((observableValue, oldTab, newTab) -> {
+			if ( oldTab != null ) {
+				if ( oldTab.getContent() instanceof ListView ) {
+					ListView listView = (ListView)oldTab.getContent();
+					listView.getSelectionModel().clearSelection();
+				}
+			}
+		});
 		
 		createStockListView();
 		createStockWatchlistListView();
