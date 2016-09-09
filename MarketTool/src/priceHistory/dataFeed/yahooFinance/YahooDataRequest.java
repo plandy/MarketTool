@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -41,11 +42,8 @@ public class YahooDataRequest {
 	*/
 	public YahooDataRequest( String p_ticker ) {
 		
-		Date l_todayDate = DateUtility.getTodayDate();
-		Date l_beginDate = null;
-		
-		String l_beginDateString = "2011-01-01";
-		l_beginDate = DateUtility.parseStringToDate( l_beginDateString );
+		Date l_todayDate = DateUtility.getTodayDate();		
+		Date l_beginDate = DateUtility.addYears( l_todayDate, -1 );
 		
 		Instant start = Instant.now();
 		
@@ -60,7 +58,7 @@ public class YahooDataRequest {
 	
 	public YahooDataRequest( String p_ticker, Date p_beginDate ) {
 		
-		Date l_todayDate = Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("America/New_York")).toInstant() );
+		Date l_todayDate = DateUtility.getTodayDate();
 		
 		Instant start = Instant.now();
 		
@@ -90,6 +88,8 @@ public class YahooDataRequest {
 	 * 
 	 * Possible FileNotFound Exception: example: if most recent request was friday, and today is sunday, no 
 	 * data will exist for saturday since there is no trading, and no file will be returned.
+	 * <p>
+	 * format of date: MM-dd-yyy
 	 * 
 	 * @param p_ticker
 	 * @param p_beginDate
@@ -97,12 +97,13 @@ public class YahooDataRequest {
 	 * @return
 	 */
 	private InputStreamReader dataRequest( String p_ticker, Date p_beginDate, Date p_endDate ){
-				
+		
+		//yahoo finance indexes months from 0-11
 		String[] dateTokens = dateTokenizer( p_beginDate );
-		String beginDateURL = "&a="+dateTokens[1]+"&b="+dateTokens[2]+"&c="+dateTokens[0];
+		String beginDateURL = "&a="+ String.valueOf((Integer.parseInt(dateTokens[1]) - 1)) +"&b="+dateTokens[2]+"&c="+dateTokens[0];
 		
 		dateTokens = dateTokenizer( p_endDate );
-		String endDateURL = "&d="+dateTokens[1]+"&e="+dateTokens[2]+"&f="+dateTokens[0];
+		String endDateURL = "&d="+ String.valueOf((Integer.parseInt(dateTokens[1]) - 1)) +"&e="+dateTokens[2]+"&f="+dateTokens[0];
 		
 		try{
 			

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.Date;
 
 import applicationConstants.StringConstants;
@@ -40,7 +41,9 @@ public final class DateUtility {
 	}
 	
 	public static Date getTodayDate() {
-		return Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("America/New_York")).toInstant() );
+		Date today = Calendar.getInstance().getTime();
+		return today;
+		//return Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("GMT-1")).toInstant() );
 	}
 	
 	public static Boolean beforeCalendarDate( Date p_date1, Date p_date2 ) {
@@ -59,6 +62,16 @@ public final class DateUtility {
 	public static Date truncateTime( Date p_date ) {
 		Date truncatedDatetime = parseStringToDate( parseDateToString(p_date) );
 		return truncatedDatetime;
+	}
+	
+	public static Date addYears( Date p_date, int p_numYears ) {
+		
+		Calendar calendar = Calendar.getInstance();
+	    calendar.setTime( p_date );
+	    calendar.add( Calendar.YEAR, p_numYears );
+	    Date newDate = calendar.getTime();
+	    
+	    return newDate;
 	}
 
 }

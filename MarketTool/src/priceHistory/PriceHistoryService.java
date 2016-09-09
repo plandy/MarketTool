@@ -26,7 +26,13 @@ public enum PriceHistoryService {
 		priceHistory = searchPriceHistory( p_ticker, p_beginDate, p_endDate );
 		
 		String mostRecentPriceDateString = getMostRecentPricehistoryDate( p_ticker );
-		Date mostRecentPriceDate = DateUtility.parseStringToDate( mostRecentPriceDateString );
+		Date mostRecentPriceDate;
+		if ( mostRecentPriceDateString.equals("") ) {
+			//no price history exists, get history for the previous year from today
+			mostRecentPriceDate = DateUtility.addYears( DateUtility.getTodayDate(), -1 );
+		} else {
+			mostRecentPriceDate = DateUtility.parseStringToDate( mostRecentPriceDateString );
+		}
 		
 		Date l_todayDate = DateUtility.getTodayDate();
 		
@@ -39,7 +45,6 @@ public enum PriceHistoryService {
 			List<DataFeedTO> missingHistory = l_rr.getPriceHistory();
 			insertPriceHistory( p_ticker, missingHistory );
 			priceHistory.addAll( missingHistory );
-			
 		}
 		
 		return priceHistory;
@@ -68,6 +73,9 @@ public enum PriceHistoryService {
 				
 				while ( results.next() ) {
 					mostRecentDate = results.getString("REQUESTDATE");
+				}
+				if ( mostRecentDate == null ) {
+					mostRecentDate = "";
 				}
 			} catch ( SQLException e ) {
 				throw new RuntimeException();
@@ -100,6 +108,9 @@ public enum PriceHistoryService {
 				while ( results.next() ) {
 					dateString = results.getString("DATE");
 					System.out.println("most recent date " +p_ticker+ " : " + dateString);
+				}
+				if ( dateString == null ) {
+					dateString = "";
 				}
 			} catch ( SQLException e ) {
 				throw new RuntimeException();

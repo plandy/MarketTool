@@ -43,7 +43,7 @@ public class PriceHistoryView extends BorderPane {
 	
 	public PriceHistoryView() {
 		super();
-		controller = new PriceHistoryController();
+		controller = new PriceHistoryController( this );
 		
 		createComponents();
 		layoutComponents();
@@ -108,8 +108,7 @@ public class PriceHistoryView extends BorderPane {
 		stockListView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<ListedStockTO>() {
 			@Override
 			public void changed(ObservableValue<? extends ListedStockTO> observable, ListedStockTO oldValue, ListedStockTO newValue) {
-				populateStockPriceChart( newValue.getTicker() );
-				populateStockVolumeChart( newValue.getTicker() );
+				controller.selectStock( newValue.getTicker() );
 			}
 		});		
 
@@ -119,8 +118,7 @@ public class PriceHistoryView extends BorderPane {
 		stockWatchlistListView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<ListedStockTO>() {
 			@Override
 			public void changed(ObservableValue<? extends ListedStockTO> observable, ListedStockTO oldValue, ListedStockTO newValue) {
-				populateStockPriceChart( newValue.getTicker() );
-				populateStockVolumeChart( newValue.getTicker() );
+				controller.selectStock( newValue.getTicker() );
 			}
 		});	
 	}
@@ -201,11 +199,6 @@ public class PriceHistoryView extends BorderPane {
         stockPriceChart.setVerticalGridLinesVisible(true);
 	}
 	
-	private void populateStockPriceChart( String p_ticker ){
-		XYChart.Series<Date, Number> closePriceSeries = controller.getPriceChartData( p_ticker );
-		stockPriceChart.getData().add( closePriceSeries );
-	}
-	
 	private void createStockVolumeChart() {
 		final CategoryAxis xCategoryAxis = new CategoryAxis();
         final NumberAxis yPriceAxis = new NumberAxis();
@@ -224,9 +217,12 @@ public class PriceHistoryView extends BorderPane {
         stockVolumeChart.setVerticalGridLinesVisible(false);
 	}
 	
-	private void populateStockVolumeChart( String p_ticker ) {
-		XYChart.Series<String, Number> closePriceSeries = controller.getVolumeChartData( p_ticker );
-		stockVolumeChart.getData().add( closePriceSeries );
+	public void populateStockPriceChart( XYChart.Series<Date, Number> p_closePriceSeries ){
+		stockPriceChart.getData().add( p_closePriceSeries );
+	}
+	
+	public void populateStockVolumeChart( XYChart.Series<String, Number> p_closePriceSeries ) {
+		stockVolumeChart.getData().add( p_closePriceSeries );
 	}
 
 }
