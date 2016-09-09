@@ -218,10 +218,12 @@ public class PriceHistoryView extends BorderPane {
 	}
 	
 	public void populateStockPriceChart( XYChart.Series<Date, Number> p_closePriceSeries ){
+		stockPriceChart.getData().clear();
 		stockPriceChart.getData().add( p_closePriceSeries );
 	}
 	
 	public void populateStockVolumeChart( XYChart.Series<String, Number> p_closePriceSeries ) {
+		stockVolumeChart.getData().clear();
 		stockVolumeChart.getData().add( p_closePriceSeries );
 	}
 
