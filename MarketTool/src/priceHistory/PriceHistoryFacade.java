@@ -43,6 +43,8 @@ public class PriceHistoryFacade extends DefaultFacade {
 			poolableConnection.commitTransaction();
 		} catch ( SQLException e ) {
 			poolableConnection.silentRollback();
+		} finally {
+			poolableConnection.returnToPool();
 		}
 		
 		return priceHistory;
@@ -70,6 +72,8 @@ public class PriceHistoryFacade extends DefaultFacade {
 			poolableConnection.commitTransaction();
 		} catch ( SQLException e ) {
 			poolableConnection.silentRollback();
+		} finally {
+			poolableConnection.returnToPool();
 		}
 		
 	}
@@ -85,6 +89,8 @@ public class PriceHistoryFacade extends DefaultFacade {
 			listedStocks = priceHistoryService.getListedStocks( poolableConnection );
 		} catch ( SQLException e ) {
 			throw new RuntimeException();
+		} finally {
+			poolableConnection.returnToPool();
 		}
 		
 		return listedStocks;
