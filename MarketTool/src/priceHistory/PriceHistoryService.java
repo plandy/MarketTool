@@ -16,24 +16,13 @@ import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
 import utility.DateUtility;
 
-public enum PriceHistoryService {
-	
-	INSTANCE;
+public class PriceHistoryService {
 	
 	public List<DataFeedTO> getPriceChartData( String p_ticker, Date p_beginDate, Date p_endDate ) {
 		
 		List<DataFeedTO> priceHistory = searchPriceHistory( p_ticker, p_beginDate, p_endDate );
 		
-		String mostRecentPriceDateString = getMostRecentPricehistoryDate( p_ticker );
-		Date mostRecentPriceDate;
-		if ( mostRecentPriceDateString.equals("") ) {
-			//no price history exists, get history for the previous year from today
-			mostRecentPriceDate = DateUtility.addYears( DateUtility.getTodayDate(), -1 );
-		} else {
-			mostRecentPriceDate = DateUtility.parseStringToDate( mostRecentPriceDateString );
-			
-		}
-		
+		Date mostRecentPriceDate = getMostRecentPricehistoryDate( p_ticker );
 		Date l_todayDate = DateUtility.getTodayDate();
 		String mostRecentRequestDateString = getMostRecentRequestDate( p_ticker );
 		
@@ -86,8 +75,9 @@ public enum PriceHistoryService {
 		return mostRecentDate;
 	}
 	
-	private String getMostRecentPricehistoryDate( String p_ticker ) {
+	private Date getMostRecentPricehistoryDate( String p_ticker ) {
 		
+		Date mostRecentPriceDate;
 		String dateString = "";
 		
 		ConnectionPool pool = new ConnectionPool(1,1);
@@ -118,8 +108,14 @@ public enum PriceHistoryService {
 			}
 		}
 		
-		return dateString;
+		if ( dateString.equals("") ) {
+			//no price history exists, get history for the previous year from today
+			mostRecentPriceDate = DateUtility.addYears( DateUtility.getTodayDate(), -1 );
+		} else {
+			mostRecentPriceDate = DateUtility.parseStringToDate( dateString );
+		}
 		
+		return mostRecentPriceDate;
 	}
 	
 	private List<DataFeedTO> searchPriceHistory( String p_ticker, Date p_beginDate, Date p_endDate ) {
@@ -167,7 +163,7 @@ public enum PriceHistoryService {
 		return priceHistory;
 	}
 	
-	private void insertPriceHistory( String p_ticker, List<DataFeedTO> p_priceHistory ) {
+	public void insertPriceHistory( String p_ticker, List<DataFeedTO> p_priceHistory ) {
 		
 		if ( p_priceHistory.isEmpty() ) {
 			return;
@@ -251,7 +247,7 @@ public enum PriceHistoryService {
 		return InitialListedStocks.listedStocks;
 	}
 	
-	private void insertDataRequestHistory( String p_ticker, Date p_date ) {
+	public void insertDataRequestHistory( String p_ticker, Date p_date ) {
 		ConnectionPool pool = new ConnectionPool(1,1);
 		PoolableConnection poolableConnection = null;
 		try {
@@ -279,6 +275,17 @@ public enum PriceHistoryService {
 				poolableConnection.silentRollback();
 			}
 		}
+	}
+	
+	/**
+	 * If the database has no priceHistory for an entity, this is called to request and insert all historic data up to 1970.
+	 */
+	public void initialisePriceHistory( String p_ticker ) {
+		Date beginDate = new Date(0);
+		YahooDataRequest yahooDataRequest = new YahooDataRequest( p_ticker, beginDate );
+		List<DataFeedTO> missingHistory = yahooDataRequest.getPriceHistory();
+		insertDataRequestHistory( p_ticker, DateUtility.getTodayDate() );
+		insertPriceHistory( p_ticker, missingHistory );
 	}
 
 }
