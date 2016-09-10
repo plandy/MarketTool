@@ -12,11 +12,11 @@ import utility.DateUtility;
 
 public class PriceHistoryController {
 	
-	private PriceHistoryService service;
+	private PriceHistoryFacade service;
 	private PriceHistoryView view;
 	
 	public PriceHistoryController( PriceHistoryView p_view ) {
-		service = PriceHistoryService.INSTANCE;
+		service = new PriceHistoryFacade();
 		view = p_view;
 	}
 	
