@@ -73,5 +73,15 @@ public final class DateUtility {
 	    
 	    return newDate;
 	}
+	
+	public static Date addDays( Date p_date, int p_numDays ) {
+		
+		Calendar calendar = Calendar.getInstance();
+	    calendar.setTime( p_date );
+	    calendar.add( Calendar.DATE, p_numDays );
+	    Date newDate = calendar.getTime();
+	    
+	    return newDate;
+	}
 
 }

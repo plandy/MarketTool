@@ -32,6 +32,7 @@ public enum PriceHistoryService {
 			mostRecentPriceDate = DateUtility.addYears( DateUtility.getTodayDate(), -1 );
 		} else {
 			mostRecentPriceDate = DateUtility.parseStringToDate( mostRecentPriceDateString );
+			mostRecentPriceDate = DateUtility.addDays( mostRecentPriceDate, 1 );
 		}
 		
 		Date l_todayDate = DateUtility.getTodayDate();
