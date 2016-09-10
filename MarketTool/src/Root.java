@@ -1,14 +1,7 @@
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 
 import applicationConstants.InitialListedStocks;
@@ -18,28 +11,13 @@ import database.PoolableConnection;
 import database.sqlite.Procs;
 import database.sqlite.Tables;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import priceHistory.ListedStockTO;
 import priceHistory.PriceHistoryView;
-import priceHistory.dataFeed.DataFeedTO;
-import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
 import utility.SystemInformationUtility;
-import view.javaFXChart.DateAxis;
 import view.menuBar.TopMenuBar;
 
 public class Root extends Application {
