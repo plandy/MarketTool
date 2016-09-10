@@ -22,8 +22,7 @@ public enum PriceHistoryService {
 	
 	public List<DataFeedTO> getPriceChartData( String p_ticker, Date p_beginDate, Date p_endDate ) {
 		
-		List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>();
-		priceHistory = searchPriceHistory( p_ticker, p_beginDate, p_endDate );
+		List<DataFeedTO> priceHistory = searchPriceHistory( p_ticker, p_beginDate, p_endDate );
 		
 		String mostRecentPriceDateString = getMostRecentPricehistoryDate( p_ticker );
 		Date mostRecentPriceDate;
@@ -32,20 +31,21 @@ public enum PriceHistoryService {
 			mostRecentPriceDate = DateUtility.addYears( DateUtility.getTodayDate(), -1 );
 		} else {
 			mostRecentPriceDate = DateUtility.parseStringToDate( mostRecentPriceDateString );
-			mostRecentPriceDate = DateUtility.addDays( mostRecentPriceDate, 1 );
+			
 		}
 		
 		Date l_todayDate = DateUtility.getTodayDate();
-		
 		String mostRecentRequestDateString = getMostRecentRequestDate( p_ticker );
 		
-		if ( mostRecentPriceDate.before(l_todayDate) )
+		if ( mostRecentPriceDate.before(l_todayDate) ) {
 			if ( mostRecentRequestDateString.isEmpty() || (!mostRecentRequestDateString.isEmpty() && DateUtility.beforeCalendarDate(DateUtility.parseStringToDate(mostRecentRequestDateString), l_todayDate)) ) {
-			YahooDataRequest l_rr = new YahooDataRequest( p_ticker, mostRecentPriceDate );
-			insertDataRequestHistory( p_ticker, l_todayDate );
-			List<DataFeedTO> missingHistory = l_rr.getPriceHistory();
-			insertPriceHistory( p_ticker, missingHistory );
-			priceHistory.addAll( missingHistory );
+				mostRecentPriceDate = DateUtility.addDays( mostRecentPriceDate, 1 );
+				YahooDataRequest yahooDataRequest = new YahooDataRequest( p_ticker, mostRecentPriceDate );
+				insertDataRequestHistory( p_ticker, l_todayDate );
+				List<DataFeedTO> missingHistory = yahooDataRequest.getPriceHistory();
+				insertPriceHistory( p_ticker, missingHistory );
+				priceHistory.addAll( missingHistory );
+			}
 		}
 		
 		return priceHistory;
