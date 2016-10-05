@@ -55,58 +55,6 @@ public class Root extends Application {
 		primaryStage.setWidth( l_screenWidth );
 		primaryStage.setHeight( l_screenHeight );
 		
-	}
-	
-	private void initialDBFunction() {
-		ConnectionPool pool = new ConnectionPool(1,1);
-		PoolableConnection poolableConnection = null;
-		try {
-			poolableConnection = pool.requestConnection();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if ( poolableConnection != null ) {
-			initialiseDatabase( poolableConnection );
-		}
-	}
-	
-	private void initialiseDatabase( PoolableConnection p_connection ) {
-		
-		try {
-			p_connection.setAutoCommit(false);
-			
-			createTables( p_connection );
-			insertInitialData( p_connection );
-			
-			p_connection.commit();
-		} catch (SQLException e) {
-			p_connection.silentRollback();
-		}
-	}
-	
-	private void createTables( Connection p_connection ) throws SQLException {
-		Statement statement = p_connection.createStatement();
-		
-		statement.execute( Tables.DROP_LISTEDSTOCKS );
-		statement.execute( Tables.CREATE_LISTEDSTOCKS );
-		
-		statement.execute( Tables.DROP_PRICEHISTORY );
-		statement.execute( Tables.CREATE_PRICEHISTORY );
-		
-		statement.execute( Tables.DROP_DATAREQUESTHISTORY );
-		statement.execute( Tables.CREATE_DATAREQUESTHISTORY );
-	}
-	
-	private void insertInitialData( Connection p_connection ) throws SQLException {
-		ArrayList<ListedStockTO> stocklist = InitialListedStocks.listedStocks;
-		PreparedStatement prepstatement = p_connection.prepareStatement(Procs.I_LISTEDSTOCKS);
-		for ( ListedStockTO stock : stocklist ) {
-			prepstatement.setString(1, stock.getTicker());
-			prepstatement.setString(2, stock.getFullname());
-			prepstatement.addBatch();
-		}
-		int[] results = prepstatement.executeBatch();
-	}
+	}	
 	
 }
