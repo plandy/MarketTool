@@ -45,8 +45,8 @@ public class PriceHistoryController {
 			volumeSeries.getData().add( volumeData );
 		}
 		
-		view.populateStockPriceChart(closePriceSeries);
-		view.populateStockVolumeChart(volumeSeries);
+		view.populateStockPriceChart( closePriceSeries );
+		view.populateStockVolumeChart( volumeSeries );
 		
 	}
 

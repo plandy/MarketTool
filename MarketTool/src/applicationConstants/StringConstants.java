@@ -18,4 +18,6 @@ public class StringConstants {
 	public static final String PRICEHISTORYVIEW_WATCHLIST_TAB = "Watchlist";
 	public static final String PRICEHISTORYVIEW_ADDTOWATCHLIST = "Add to watchlist";
 	
+	public static final String SIMPLEMOVINGAVERAGE_DAYS = "simpleMovingAverage_";
+	
 }

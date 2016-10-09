@@ -2,11 +2,9 @@ package priceHistory;
 
 import java.util.Date;
 
-import applicationConstants.InitialListedStocks;
 import applicationConstants.StringConstants;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -26,7 +24,6 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.util.Callback;
 import view.javaFXChart.DateAxis;
 
 public class PriceHistoryView extends BorderPane {

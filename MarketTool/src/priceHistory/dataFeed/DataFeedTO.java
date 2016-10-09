@@ -1,7 +1,9 @@
 package priceHistory.dataFeed;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.HashMap;
+
+import applicationConstants.StringConstants;
 
 public class DataFeedTO {
 	
@@ -17,13 +19,30 @@ public class DataFeedTO {
 	private BigDecimal closePrice;
 	private int volume;
 	
+	private HashMap<String, Object> map;
+	
+	private void setValue( String p_key, Object p_value ) {
+		map.put(p_key, p_value);
+	}
+	
+	private Object getValue( String p_key ) {
+		return map.get( p_key );
+	}
+	
+	public void setSimpleMovingAverage( int p_numDays, BigDecimal p_movingAverage ) {
+		setValue( StringConstants.SIMPLEMOVINGAVERAGE_DAYS + String.valueOf(p_numDays), p_movingAverage );
+	}
+	
+	public BigDecimal getSimpleMovingAverage( int p_numDays ) {
+		return (BigDecimal) getValue( StringConstants.SIMPLEMOVINGAVERAGE_DAYS + String.valueOf(p_numDays) );
+	}
+	
 	public String getTicker() {
 		return ticker;
 	}
 	public void setTicker(String ticker) {
 		this.ticker = ticker;
 	}
-	
 	public String getDate() {
 		return date;
 	}
@@ -60,5 +79,7 @@ public class DataFeedTO {
 	public void setVolume(int volume) {
 		this.volume = volume;
 	}
+	
+	
 	
 }
