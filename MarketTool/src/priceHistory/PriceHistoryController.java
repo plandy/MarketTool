@@ -28,6 +28,8 @@ public class PriceHistoryController {
 	}
 	
 	public void selectStock( String p_ticker ) {
+		selectedHistory = null;
+		
 		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
 		XYChart.Series<String, Number> volumeSeries = new XYChart.Series<>();
 		
