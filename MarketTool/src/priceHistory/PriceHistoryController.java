@@ -30,16 +30,20 @@ public class PriceHistoryController {
 	public void selectStock( String p_ticker ) {
 		selectedHistory = null;
 		
-		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
-		XYChart.Series<String, Number> volumeSeries = new XYChart.Series<>();
-		
 		Date todayDate = DateUtility.getTodayDate();
 		Date beginDate = DateUtility.parseStringToDate("2015-08-29");
 		
 		selectedHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
-		Date l_thisDate;
+			
+		showBasicHistory( selectedHistory );
+	}
+	
+	private void showBasicHistory( List<DataFeedTO> p_selectedHistory ) {
+		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
+		XYChart.Series<String, Number> volumeSeries = new XYChart.Series<>();
 		
-		for ( DataFeedTO dataTO : selectedHistory ) {
+		Date l_thisDate;
+		for ( DataFeedTO dataTO : p_selectedHistory ) {
 			l_thisDate = DateUtility.parseStringToDate( dataTO.getDate() );
 			
 			Data<Date, Number> priceData = new Data<Date, Number>( l_thisDate, (Number)dataTO.getClosePrice() );
@@ -50,8 +54,7 @@ public class PriceHistoryController {
 		}
 		
 		view.populateStockPriceChart( closePriceSeries );
-		view.populateStockVolumeChart( volumeSeries );	
-		
+		view.populateStockVolumeChart( volumeSeries );
 	}
 
 }
