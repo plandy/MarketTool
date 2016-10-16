@@ -20,11 +20,11 @@ public class TechnicalAnalysisService {
 	 * @param p_numDays
 	 * @param p_priceHistory
 	 */
-	public static void calculateSimpleMovingAverage( int p_numDays, List<DataFeedTO> p_priceHistory ) {
+	public void calculateSimpleMovingAverage( int p_numDays, List<DataFeedTO> p_priceHistory ) {
 		
 		BigDecimal movingAverage = new BigDecimal( 0 );
 		BigDecimal numDays = new BigDecimal( p_numDays );
-		int size = p_priceHistory.size();
+		int size = p_priceHistory.size() - 1;
 		int reverseIndex = size;
 		boolean firstAverage = true;
 		
@@ -32,7 +32,7 @@ public class TechnicalAnalysisService {
 			DataFeedTO currentDataPoint = p_priceHistory.get( reverseIndex );
 			
 			if ( firstAverage ) {
-				movingAverage.add( currentDataPoint.getClosePrice() );
+				movingAverage = movingAverage.add( currentDataPoint.getClosePrice() );
 				if ( reverseIndex == (size - p_numDays) ) {
 					movingAverage = ( movingAverage.divide(numDays) );
 					firstAverage = false;
@@ -47,6 +47,8 @@ public class TechnicalAnalysisService {
 				
 				p_priceHistory.get( reverseIndex + p_numDays ).setSimpleMovingAverage( p_numDays, movingAverage );
 			}
+			
+			reverseIndex--;
 			
 		}
 		

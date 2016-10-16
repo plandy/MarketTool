@@ -19,7 +19,7 @@ public class DataFeedTO {
 	private BigDecimal closePrice;
 	private int volume;
 	
-	private HashMap<String, Object> map;
+	private HashMap<String, Object> map = new HashMap<String, Object>();
 	
 	private void setValue( String p_key, Object p_value ) {
 		map.put(p_key, p_value);
