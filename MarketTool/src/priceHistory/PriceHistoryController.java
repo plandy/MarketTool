@@ -15,6 +15,8 @@ public class PriceHistoryController {
 	private PriceHistoryFacade service;
 	private PriceHistoryView view;
 	
+	private List<DataFeedTO> selectedHistory;
+	
 	public PriceHistoryController( PriceHistoryView p_view ) {
 		service = new PriceHistoryFacade();
 		view = p_view;
@@ -32,10 +34,10 @@ public class PriceHistoryController {
 		Date todayDate = DateUtility.getTodayDate();
 		Date beginDate = DateUtility.parseStringToDate("2015-08-29");
 		
-		List<DataFeedTO> priceHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
+		selectedHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
 		Date l_thisDate;
 		
-		for ( DataFeedTO dataTO : priceHistory ) {
+		for ( DataFeedTO dataTO : selectedHistory ) {
 			l_thisDate = DateUtility.parseStringToDate( dataTO.getDate() );
 			
 			Data<Date, Number> priceData = new Data<Date, Number>( l_thisDate, (Number)dataTO.getClosePrice() );
