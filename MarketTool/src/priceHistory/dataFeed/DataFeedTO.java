@@ -29,14 +29,6 @@ public class DataFeedTO {
 		return map.get( p_key );
 	}
 	
-	public void setSimpleMovingAverage( int p_numDays, BigDecimal p_movingAverage ) {
-		setValue( StringConstants.SIMPLEMOVINGAVERAGE_DAYS + String.valueOf(p_numDays), p_movingAverage );
-	}
-	
-	public BigDecimal getSimpleMovingAverage( int p_numDays ) {
-		return (BigDecimal) getValue( StringConstants.SIMPLEMOVINGAVERAGE_DAYS + String.valueOf(p_numDays) );
-	}
-	
 	public String getTicker() {
 		return ticker;
 	}
@@ -80,6 +72,20 @@ public class DataFeedTO {
 		this.volume = volume;
 	}
 	
+	public void setSimpleMovingAverage( int p_numDays, BigDecimal p_movingAverage ) {
+		setValue( StringConstants.SIMPLEMOVINGAVERAGE_DAYS + String.valueOf(p_numDays), p_movingAverage );
+	}
 	
+	public BigDecimal getSimpleMovingAverage( int p_numDays ) {
+		return (BigDecimal) getValue( StringConstants.SIMPLEMOVINGAVERAGE_DAYS + String.valueOf(p_numDays) );
+	}
+	
+	public void setExponentialMovingAverage( int p_numDays, BigDecimal p_movingAverage ) {
+		setValue( StringConstants.EXPONENTIALMOVINGAVERAGE_DAYS + String.valueOf(p_numDays), p_movingAverage );
+	}
+	
+	public BigDecimal getExponentialMovingAverage( int p_numDays ) {
+		return (BigDecimal) getValue( StringConstants.EXPONENTIALMOVINGAVERAGE_DAYS + String.valueOf(p_numDays) );
+	}
 	
 }

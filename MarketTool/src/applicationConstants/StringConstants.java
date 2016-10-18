@@ -19,5 +19,5 @@ public class StringConstants {
 	public static final String PRICEHISTORYVIEW_ADDTOWATCHLIST = "Add to watchlist";
 	
 	public static final String SIMPLEMOVINGAVERAGE_DAYS = "simpleMovingAverage_";
-	
+	public static final String EXPONENTIALMOVINGAVERAGE_DAYS = "exponentialMovingAverage_";
 }

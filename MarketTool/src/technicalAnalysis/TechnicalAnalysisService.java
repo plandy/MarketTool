@@ -13,8 +13,8 @@ public class TechnicalAnalysisService {
 	
 	/**
 	 * Sets a simple moving average on the priceHistory using the specified period.
-	 * <p>
-	 * Works backwards from the most recent date in the history, data points with less previous history than the
+	 * 
+	 * <p>Works backwards from the most recent date in the history, data points with less previous history than the
 	 * <b>p_numDays</b> will have null SMA value given.
 	 * 
 	 * @param p_numDays
@@ -49,6 +49,49 @@ public class TechnicalAnalysisService {
 			}
 			
 			reverseIndex--;
+			
+		}
+		
+	}
+	
+	/**
+	 * Sets an exponential moving average on the priceHistory using the specified period.
+	 * 
+	 * <p>Initialises first average by calculating a <b>Simple Moving Average</b>. Data points with less previous history than the
+	 * <b>p_numDays</b> will have null EMA value given.
+	 * 
+	 * @param p_numDays
+	 * @param p_priceHistory
+	 */
+	public void calculateExponentialMovingAverage( int p_numDays, List<DataFeedTO> p_priceHistory ) {
+		BigDecimal movingAverage = new BigDecimal( 0 );
+		BigDecimal previousAverage = new BigDecimal( 0 );
+		BigDecimal alpha = new BigDecimal( 0 );
+		BigDecimal numDays = new BigDecimal( p_numDays );
+		int size = p_priceHistory.size() - 1;
+		int index = 0;
+		
+		boolean firstAverage = true;
+		
+		while ( index < size ) {
+			DataFeedTO currentDataPoint = p_priceHistory.get( index );
+			
+			if ( firstAverage ) {
+				
+				movingAverage = movingAverage.add( currentDataPoint.getClosePrice() );
+				
+				if ( index == (p_numDays - 1) ) {
+					movingAverage = movingAverage.divide( numDays );
+					
+					previousAverage = movingAverage;
+					currentDataPoint.setExponentialMovingAverage( p_numDays, movingAverage );
+				}
+			} else {
+				movingAverage = previousAverage.add( alpha.multiply(currentDataPoint.getClosePrice().subtract(previousAverage)) );
+				
+				previousAverage = movingAverage;
+				currentDataPoint.setExponentialMovingAverage( p_numDays, movingAverage );
+			}
 			
 		}
 		
