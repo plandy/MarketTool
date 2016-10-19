@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import applicationConstants.InitialListedStocks;
 import applicationConstants.StringConstants;
 import database.ConnectionManager;
+import database.DatabaseFacade;
 import database.PoolableConnection;
 import database.sqlite.Procs;
 import database.sqlite.Tables;
@@ -32,42 +33,9 @@ public class InitialiseDatabaseItem extends MenuItem {
 	
 	private void initialiseDatabase() {
 		
-		PoolableConnection connection = ConnectionManager.INSTANCE.getConnection();
+		DatabaseFacade databaseFacade = new DatabaseFacade();
+		databaseFacade.initialiseDatabase();
 		
-		try {
-			connection.setAutoCommit(false);
-			
-			createTables( connection );
-			insertInitialData( connection );
-			
-			connection.commit();
-		} catch (SQLException e) {
-			throw new RuntimeException();
-		}
-	}
-	
-	private void createTables( Connection p_connection ) throws SQLException {
-		Statement statement = p_connection.createStatement();
-		
-		statement.execute( Tables.DROP_LISTEDSTOCKS );
-		statement.execute( Tables.CREATE_LISTEDSTOCKS );
-		
-		statement.execute( Tables.DROP_PRICEHISTORY );
-		statement.execute( Tables.CREATE_PRICEHISTORY );
-		
-		statement.execute( Tables.DROP_DATAREQUESTHISTORY );
-		statement.execute( Tables.CREATE_DATAREQUESTHISTORY );
-	}
-	
-	private void insertInitialData( Connection p_connection ) throws SQLException {
-		ArrayList<ListedStockTO> stocklist = InitialListedStocks.listedStocks;
-		PreparedStatement prepstatement = p_connection.prepareStatement( Procs.I_LISTEDSTOCKS );
-		for ( ListedStockTO stock : stocklist ) {
-			prepstatement.setString( 1, stock.getTicker() );
-			prepstatement.setString( 2, stock.getFullname() );
-			prepstatement.addBatch();
-		}
-		int[] results = prepstatement.executeBatch();
 	}
 	
 }

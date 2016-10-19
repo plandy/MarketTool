@@ -10,8 +10,8 @@ public class DatabaseMenu extends Menu {
 	public DatabaseMenu() {
 		super( StringConstants.DATA_MENU_TITLE );
 		
-		//this.getItems().add( new ClearAllDataItem() );
 		this.getItems().add( new InitialiseDatabaseItem() );
+		this.getItems().add( new ClearAllDataItem() );
 		
 	}
 
