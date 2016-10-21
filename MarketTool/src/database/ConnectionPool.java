@@ -18,8 +18,9 @@ public class ConnectionPool {
 		if ( p_maxPoolSize < p_initialPoolSize || p_initialPoolSize < 0 || p_maxPoolSize < 1 ) {
 			throw new IllegalArgumentException("blarg");
 		}
+		maxPoolSize = p_maxPoolSize;
 		currentPoolSize = new AtomicInteger(0);
-		connectionPool = new LinkedBlockingQueue<PoolableConnection>(p_maxPoolSize);		
+		connectionPool = new LinkedBlockingQueue<PoolableConnection>( p_maxPoolSize );		
 		
 		for ( int count = 0; count < p_initialPoolSize; count++ ) {
 			addConnection();

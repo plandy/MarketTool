@@ -7,8 +7,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import applicationConstants.InitialListedStocks;
-import database.sqlite.Procs;
 import database.sqlite.Tables;
+import database.sqlite.procedures.ProcedureDefinitions;
 import priceHistory.ListedStockTO;
 
 public class DatabaseService {
@@ -28,7 +28,7 @@ public class DatabaseService {
 	
 	public void insertInitialData( Connection p_connection ) throws SQLException {
 		ArrayList<ListedStockTO> stocklist = InitialListedStocks.listedStocks;
-		PreparedStatement prepstatement = p_connection.prepareStatement( Procs.I_LISTEDSTOCKS );
+		PreparedStatement prepstatement = p_connection.prepareStatement( ProcedureDefinitions.I_LISTEDSTOCKS );
 		for ( ListedStockTO stock : stocklist ) {
 			prepstatement.setString( 1, stock.getTicker() );
 			prepstatement.setString( 2, stock.getFullname() );

@@ -33,7 +33,8 @@ public class PriceHistoryController {
 		Date todayDate = DateUtility.getTodayDate();
 		Date beginDate = DateUtility.parseStringToDate("2015-08-29");
 		
-		selectedHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
+		//selectedHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
+		selectedHistory = service.getAllPriceHistory( p_ticker );
 			
 		showBasicHistory( selectedHistory );
 	}

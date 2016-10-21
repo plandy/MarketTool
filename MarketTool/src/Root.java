@@ -1,21 +1,9 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-
-import applicationConstants.InitialListedStocks;
 import applicationConstants.StringConstants;
-import database.ConnectionPool;
-import database.PoolableConnection;
-import database.sqlite.Procs;
-import database.sqlite.Tables;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import priceHistory.ListedStockTO;
 import priceHistory.PriceHistoryView;
 import utility.SystemInformationUtility;
 import view.menuBar.TopMenuBar;

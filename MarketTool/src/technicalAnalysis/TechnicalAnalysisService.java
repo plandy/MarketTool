@@ -77,7 +77,6 @@ public class TechnicalAnalysisService {
 			DataFeedTO currentDataPoint = p_priceHistory.get( index );
 			
 			if ( firstAverage ) {
-				
 				movingAverage = movingAverage.add( currentDataPoint.getClosePrice() );
 				
 				if ( index == (p_numDays - 1) ) {

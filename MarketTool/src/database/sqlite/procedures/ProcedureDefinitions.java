@@ -1,7 +1,6 @@
-package database.sqlite;
+package database.sqlite.procedures;
 
-public class Procs {
-	
+public class ProcedureDefinitions {
 	public static final String I_LISTEDSTOCKS = "insert into LISTEDSTOCKS "
 			+ "(TICKER, "
 			+ "FULLNAME) "

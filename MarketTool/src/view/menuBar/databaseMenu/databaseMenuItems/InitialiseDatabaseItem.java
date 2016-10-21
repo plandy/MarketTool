@@ -11,7 +11,6 @@ import applicationConstants.StringConstants;
 import database.ConnectionManager;
 import database.DatabaseFacade;
 import database.PoolableConnection;
-import database.sqlite.Procs;
 import database.sqlite.Tables;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
