@@ -107,7 +107,7 @@ public class ProcedureImplementations {
 		for ( DataFeedTO dataTO : p_priceHistory ) {
 			
 			preparedStatement.setString(1, p_ticker );
-			preparedStatement.setString(2, dataTO.getDate() );
+			preparedStatement.setString(2, dataTO.getDateAsString() );
 			preparedStatement.setBigDecimal(3, dataTO.getOpenPrice());
 			preparedStatement.setBigDecimal(4, dataTO.getHighPrice());
 			preparedStatement.setBigDecimal(5, dataTO.getLowPrice());

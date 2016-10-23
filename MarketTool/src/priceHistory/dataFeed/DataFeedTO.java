@@ -1,9 +1,11 @@
 package priceHistory.dataFeed;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 
 import applicationConstants.StringConstants;
+import utility.DateUtility;
 
 public class DataFeedTO {
 	
@@ -35,9 +37,14 @@ public class DataFeedTO {
 	public void setTicker(String ticker) {
 		this.ticker = ticker;
 	}
-	public String getDate() {
+	public String getDateAsString() {
 		return date;
 	}
+	
+	public Date getDateAsDate() {
+		return DateUtility.parseStringToDate( date );
+	}
+	
 	public void setDate(String date) {
 		this.date = date;
 	}

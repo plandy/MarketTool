@@ -45,12 +45,12 @@ public class PriceHistoryController {
 		
 		Date l_thisDate;
 		for ( DataFeedTO dataTO : p_selectedHistory ) {
-			l_thisDate = DateUtility.parseStringToDate( dataTO.getDate() );
+			l_thisDate = dataTO.getDateAsDate();
 			
 			Data<Date, Number> priceData = new Data<Date, Number>( l_thisDate, (Number)dataTO.getClosePrice() );
 			closePriceSeries.getData().add( priceData );
 			
-			Data<String, Number> volumeData = new Data<String, Number>( dataTO.getDate(), (Number)(dataTO.getVolume()/100000) );
+			Data<String, Number> volumeData = new Data<String, Number>( dataTO.getDateAsString(), (Number)(dataTO.getVolume()/100000) );
 			volumeSeries.getData().add( volumeData );
 		}
 		
