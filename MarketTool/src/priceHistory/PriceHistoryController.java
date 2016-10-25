@@ -58,10 +58,14 @@ public class PriceHistoryController {
 		view.populateStockVolumeChart( volumeSeries );
 	}
 	
-	private Integer findIndexByDateLinearSearch( List<DataFeedTO> p_selectedHistory ) {
-		
+	private Integer findIndexOfDefaultDate( List<DataFeedTO> p_selectedHistory ) {
 		Date todayDate = DateUtility.getTodayDate();
 		Date beginDate = DateUtility.addYears( todayDate, -1 );
+		
+		return findIndexByDateLinearSearch( p_selectedHistory, beginDate );
+	}
+	
+	private Integer findIndexByDateLinearSearch( List<DataFeedTO> p_selectedHistory, Date p_dateToFind ) {
 		
 		int index = p_selectedHistory.size();
 		
@@ -72,7 +76,7 @@ public class PriceHistoryController {
 			index--;
 			
 			DataFeedTO dataPoint = p_selectedHistory.get( index );
-			isBefore = DateUtility.isBeforeCalendarDate(dataPoint.getDateAsDate(), beginDate);
+			isBefore = DateUtility.isBeforeCalendarDate(dataPoint.getDateAsDate(), p_dateToFind);
 			
 			if ( isBefore == false ) {
 				isFound = true;
