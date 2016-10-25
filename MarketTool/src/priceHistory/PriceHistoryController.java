@@ -65,6 +65,13 @@ public class PriceHistoryController {
 		return findIndexByDateLinearSearch( p_selectedHistory, beginDate );
 	}
 	
+	/**
+	 * Finds the first datapoint in the history with date <= <b>p_dateToFind</b>
+	 * 
+	 * @param p_selectedHistory
+	 * @param p_dateToFind
+	 * @return
+	 */
 	private Integer findIndexByDateLinearSearch( List<DataFeedTO> p_selectedHistory, Date p_dateToFind ) {
 		
 		int index = p_selectedHistory.size();
