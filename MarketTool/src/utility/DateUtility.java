@@ -46,13 +46,39 @@ public final class DateUtility {
 		//return Date.from( ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("GMT-1")).toInstant() );
 	}
 	
-	public static Boolean beforeCalendarDate( Date p_date1, Date p_date2 ) {
+	public static Boolean isBeforeCalendarDate( Date p_date1, Date p_date2 ) {
 		Boolean isBefore = false;
 		
 		Date truncatedDate1 = truncateTime( p_date1 );
 		Date truncatedDate2 = truncateTime( p_date2 );
 		
 		if ( truncatedDate1.before(truncatedDate2) ) {
+			isBefore = true;
+		}
+		
+		return isBefore;
+	}
+	
+	public static Boolean isSameCalendarDate( Date p_date1, Date p_date2 ) {
+		Boolean isSame = false;
+		
+		Date truncatedDate1 = truncateTime( p_date1 );
+		Date truncatedDate2 = truncateTime( p_date2 );
+		
+		if ( truncatedDate1.equals(truncatedDate2) ) {
+			isSame = true;
+		}
+		
+		return isSame;
+	}
+	
+	public static Boolean isAfterCalendarDate( Date p_date1, Date p_date2 ) {
+		Boolean isBefore = false;
+		
+		Date truncatedDate1 = truncateTime( p_date1 );
+		Date truncatedDate2 = truncateTime( p_date2 );
+		
+		if ( truncatedDate1.after(truncatedDate2) ) {
 			isBefore = true;
 		}
 		

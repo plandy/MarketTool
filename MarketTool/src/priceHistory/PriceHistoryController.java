@@ -57,5 +57,54 @@ public class PriceHistoryController {
 		view.populateStockPriceChart( closePriceSeries );
 		view.populateStockVolumeChart( volumeSeries );
 	}
+	
+	private Integer findIndexByDateLinearSearch( List<DataFeedTO> p_selectedHistory ) {
+		
+		Date todayDate = DateUtility.getTodayDate();
+		Date beginDate = DateUtility.addYears( todayDate, -1 );
+		
+		int index = p_selectedHistory.size();
+		
+		boolean isFound = false;
+		boolean isBefore = false;
+		
+		while ( !isFound ) {
+			index--;
+			
+			DataFeedTO dataPoint = p_selectedHistory.get( index );
+			isBefore = DateUtility.isBeforeCalendarDate(dataPoint.getDateAsDate(), beginDate);
+			
+			if ( isBefore == false ) {
+				isFound = true;
+			}
+		}
+		
+		return index;
+	}
+	
+	//TODO finish
+	private Integer findIndexByDateBinarySearch( List<DataFeedTO> p_selectedHistory ) {
+		
+		Date todayDate = DateUtility.getTodayDate();
+		Date beginDate = DateUtility.addYears( todayDate, -1 );
+		
+		int listSize = p_selectedHistory.size();
+		int index = listSize / 2;
+		
+		boolean isFound = false;
+		
+		while ( !isFound ) {
+			DataFeedTO dataPoint = p_selectedHistory.get( index );
+			if ( DateUtility.isSameCalendarDate(dataPoint.getDateAsDate(), beginDate) ) {
+				isFound = true;
+			} else if ( DateUtility.isBeforeCalendarDate(dataPoint.getDateAsDate(), beginDate) ) {
+				index = ( index + listSize ) / 2;
+			} else {
+				index = index / 2;
+			}
+		}
+		
+		return index;
+	}
 
 }
