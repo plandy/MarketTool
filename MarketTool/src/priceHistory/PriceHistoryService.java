@@ -45,7 +45,7 @@ public class PriceHistoryService {
 		
 		Date mostRecentRequestDate = databaseProc.getMostRecentRequestDate( p_ticker, p_connection );
 		Date todayDate = DateUtility.getTodayDate();
-		if ( DateUtility.beforeCalendarDate(mostRecentRequestDate, todayDate) ) {
+		if ( DateUtility.isBeforeCalendarDate(mostRecentRequestDate, todayDate) ) {
 			p_mostRecentPriceDate = DateUtility.addDays( p_mostRecentPriceDate, 1 );
 			YahooDataRequest yahooDataRequest = new YahooDataRequest( p_ticker, p_mostRecentPriceDate );
 			databaseProc.insertDataRequestHistory( p_ticker, todayDate, p_connection );
@@ -66,7 +66,7 @@ public class PriceHistoryService {
 		//String mostRecentRequestDateString = priceHistoryService.getMostRecentRequestDate( p_ticker, poolableConnection );
 		String mostRecentRequestDateString = "";
 		if ( mostRecentPriceDate.before(l_todayDate) ) {
-			if ( mostRecentRequestDateString.isEmpty() || (!mostRecentRequestDateString.isEmpty() && DateUtility.beforeCalendarDate(DateUtility.parseStringToDate(mostRecentRequestDateString), l_todayDate)) ) {
+			if ( mostRecentRequestDateString.isEmpty() || (!mostRecentRequestDateString.isEmpty() && DateUtility.isBeforeCalendarDate(DateUtility.parseStringToDate(mostRecentRequestDateString), l_todayDate)) ) {
 				mostRecentPriceDate = DateUtility.addDays( mostRecentPriceDate, 1 );
 				YahooDataRequest yahooDataRequest = new YahooDataRequest( p_ticker, mostRecentPriceDate );
 				databaseProc.insertDataRequestHistory( p_ticker, l_todayDate, p_connection );
