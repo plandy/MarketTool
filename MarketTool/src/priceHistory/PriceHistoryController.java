@@ -23,7 +23,7 @@ public class PriceHistoryController {
 	}
 	
 	public ObservableList<ListedStockTO> getListedStocks() {
-		List<ListedStockTO> listedStocks = service.getListedStocks();		
+		List<ListedStockTO> listedStocks = service.getListedStocks();
 		return FXCollections.observableArrayList( listedStocks );
 	}
 	
@@ -35,7 +35,7 @@ public class PriceHistoryController {
 		
 		//selectedHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
 		selectedHistory = service.getAllPriceHistory( p_ticker );
-			
+		
 		showBasicHistory( selectedHistory );
 	}
 	
@@ -43,19 +43,27 @@ public class PriceHistoryController {
 		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
 		XYChart.Series<String, Number> volumeSeries = new XYChart.Series<>();
 		
-		Date l_thisDate;
-		for ( DataFeedTO dataTO : p_selectedHistory ) {
-			l_thisDate = dataTO.getDateAsDate();
+		int beginDateIndex = findIndexOfDefaultDate( p_selectedHistory ).intValue();
+		int calculationPeriodIndex = beginDateIndex - 200;
+		
+		Date thisDate;
+		
+		while ( beginDateIndex < p_selectedHistory.size() - 1 ) {
+			DataFeedTO dataTO = p_selectedHistory.get( beginDateIndex );
+			thisDate = dataTO.getDateAsDate();
 			
-			Data<Date, Number> priceData = new Data<Date, Number>( l_thisDate, (Number)dataTO.getClosePrice() );
+			Data<Date, Number> priceData = new Data<Date, Number>( thisDate, (Number)dataTO.getClosePrice() );
 			closePriceSeries.getData().add( priceData );
 			
 			Data<String, Number> volumeData = new Data<String, Number>( dataTO.getDateAsString(), (Number)(dataTO.getVolume()/100000) );
 			volumeSeries.getData().add( volumeData );
+			
+			beginDateIndex++;
 		}
 		
 		view.populateStockPriceChart( closePriceSeries );
 		view.populateStockVolumeChart( volumeSeries );
+		
 	}
 	
 	private Integer findIndexOfDefaultDate( List<DataFeedTO> p_selectedHistory ) {
@@ -83,9 +91,9 @@ public class PriceHistoryController {
 			index--;
 			
 			DataFeedTO dataPoint = p_selectedHistory.get( index );
-			isBefore = DateUtility.isBeforeCalendarDate(dataPoint.getDateAsDate(), p_dateToFind);
+			isBefore = DateUtility.isBeforeCalendarDate( dataPoint.getDateAsDate(), p_dateToFind );
 			
-			if ( isBefore == false ) {
+			if ( isBefore == true ) {
 				isFound = true;
 			}
 		}
