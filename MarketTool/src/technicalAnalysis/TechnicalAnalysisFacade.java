@@ -36,4 +36,29 @@ public class TechnicalAnalysisFacade {
 		int numDays = 200;
 		service.calculateSimpleMovingAverage( numDays, p_priceHistory );
 	}
+	
+	public void calculateExponentialMovingAverage_10Day( List<DataFeedTO> p_priceHistory ) {
+		int numDays = 10;
+		service.calculateExponentialMovingAverage( numDays, p_priceHistory );
+	}
+	
+	public void calculateExponentialMovingAverage_20Day( List<DataFeedTO> p_priceHistory ) {
+		int numDays = 20;
+		service.calculateExponentialMovingAverage( numDays, p_priceHistory );
+	}
+	
+	public void calculateExponentialMovingAverage_50Day( List<DataFeedTO> p_priceHistory ) {
+		int numDays = 50;
+		service.calculateExponentialMovingAverage( numDays, p_priceHistory );
+	}
+	
+	public void calculateExponentialMovingAverage_100Day( List<DataFeedTO> p_priceHistory ) {
+		int numDays = 100;
+		service.calculateExponentialMovingAverage( numDays, p_priceHistory );
+	}
+	
+	public void calculateExponentialMovingAverage_200Day( List<DataFeedTO> p_priceHistory ) {
+		int numDays = 200;
+		service.calculateExponentialMovingAverage( numDays, p_priceHistory );
+	}
 }

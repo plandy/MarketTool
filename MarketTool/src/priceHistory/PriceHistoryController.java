@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import priceHistory.dataFeed.DataFeedTO;
+import technicalAnalysis.TechnicalAnalysisFacade;
 import utility.DateUtility;
 
 public class PriceHistoryController {
@@ -30,10 +31,6 @@ public class PriceHistoryController {
 	public void selectStock( String p_ticker ) {
 		selectedHistory = null;
 		
-		Date todayDate = DateUtility.getTodayDate();
-		Date beginDate = DateUtility.parseStringToDate("2015-08-29");
-		
-		//selectedHistory = service.getPriceChartData( p_ticker, beginDate, todayDate );
 		selectedHistory = service.getAllPriceHistory( p_ticker );
 		
 		showBasicHistory( selectedHistory );
@@ -42,9 +39,12 @@ public class PriceHistoryController {
 	private void showBasicHistory( List<DataFeedTO> p_selectedHistory ) {
 		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
 		XYChart.Series<String, Number> volumeSeries = new XYChart.Series<>();
+		XYChart.Series<Date, Number> sma100DaySeries = new XYChart.Series<>();
 		
 		int beginDateIndex = findIndexOfDefaultDate( p_selectedHistory ).intValue();
-		int calculationPeriodIndex = beginDateIndex - 200;
+		
+		TechnicalAnalysisFacade techFacade = new TechnicalAnalysisFacade();
+		techFacade.calculateSimpleMovingAverage_10Day( p_selectedHistory );
 		
 		Date thisDate;
 		
@@ -58,12 +58,16 @@ public class PriceHistoryController {
 			Data<String, Number> volumeData = new Data<String, Number>( dataTO.getDateAsString(), (Number)(dataTO.getVolume()/100000) );
 			volumeSeries.getData().add( volumeData );
 			
+			Data<Date, Number> sma100DayData = new Data<Date, Number>( thisDate, (Number)dataTO.getSimpleMovingAverage(10) );
+			sma100DaySeries.getData().add( sma100DayData );
+			
 			beginDateIndex++;
 		}
 		
 		view.populateStockPriceChart( closePriceSeries );
 		view.populateStockVolumeChart( volumeSeries );
 		
+		view.populateStockPriceAux( sma100DaySeries );
 	}
 	
 	private Integer findIndexOfDefaultDate( List<DataFeedTO> p_selectedHistory ) {

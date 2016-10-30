@@ -66,8 +66,11 @@ public class TechnicalAnalysisService {
 	public void calculateExponentialMovingAverage( int p_numDays, List<DataFeedTO> p_priceHistory ) {
 		BigDecimal movingAverage = new BigDecimal( 0 );
 		BigDecimal previousAverage = new BigDecimal( 0 );
-		BigDecimal alpha = new BigDecimal( 0 );
 		BigDecimal numDays = new BigDecimal( p_numDays );
+		double x = p_numDays;
+		double y = 2 / (x+1);
+		BigDecimal alpha = new BigDecimal( y );
+		
 		int size = p_priceHistory.size() - 1;
 		int index = 0;
 		
@@ -84,6 +87,8 @@ public class TechnicalAnalysisService {
 					
 					previousAverage = movingAverage;
 					currentDataPoint.setExponentialMovingAverage( p_numDays, movingAverage );
+					
+					firstAverage = false;
 				}
 			} else {
 				movingAverage = previousAverage.add( alpha.multiply(currentDataPoint.getClosePrice().subtract(previousAverage)) );
@@ -91,7 +96,7 @@ public class TechnicalAnalysisService {
 				previousAverage = movingAverage;
 				currentDataPoint.setExponentialMovingAverage( p_numDays, movingAverage );
 			}
-			
+			index++;
 		}
 		
 	}
