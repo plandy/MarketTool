@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import priceHistory.dataFeed.DataFeedTO;
+import priceHistory.dataFeed.PriceHistoryTO;
 import technicalAnalysis.TechnicalAnalysisFacade;
 import utility.DateUtility;
 
@@ -16,7 +17,7 @@ public class PriceHistoryController {
 	private PriceHistoryFacade service;
 	private PriceHistoryView view;
 	
-	private List<DataFeedTO> selectedHistory;
+	private PriceHistoryTO selectedHistory;
 	
 	public PriceHistoryController( PriceHistoryView p_view ) {
 		service = new PriceHistoryFacade();
@@ -36,7 +37,7 @@ public class PriceHistoryController {
 		showBasicHistory( selectedHistory );
 	}
 	
-	private void showBasicHistory( List<DataFeedTO> p_selectedHistory ) {
+	private void showBasicHistory( PriceHistoryTO p_selectedHistory ) {
 		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
 		XYChart.Series<String, Number> volumeSeries = new XYChart.Series<>();
 		XYChart.Series<Date, Number> sma100DaySeries = new XYChart.Series<>();
@@ -44,21 +45,20 @@ public class PriceHistoryController {
 		int beginDateIndex = findIndexOfDefaultDate( p_selectedHistory ).intValue();
 		
 		TechnicalAnalysisFacade techFacade = new TechnicalAnalysisFacade();
-		techFacade.calculateSimpleMovingAverage_10Day( p_selectedHistory );
+		techFacade.calculateExponentialMovingAverage_10Day( p_selectedHistory );
 		
 		Date thisDate;
 		
-		while ( beginDateIndex < p_selectedHistory.size() - 1 ) {
-			DataFeedTO dataTO = p_selectedHistory.get( beginDateIndex );
-			thisDate = dataTO.getDateAsDate();
+		while ( beginDateIndex < p_selectedHistory.numElements - 1 ) {
+			thisDate = DateUtility.parseStringToDate( p_selectedHistory.date[beginDateIndex] );
 			
-			Data<Date, Number> priceData = new Data<Date, Number>( thisDate, (Number)dataTO.getClosePrice() );
+			Data<Date, Number> priceData = new Data<Date, Number>( thisDate, p_selectedHistory.closePrice[beginDateIndex] );
 			closePriceSeries.getData().add( priceData );
 			
-			Data<String, Number> volumeData = new Data<String, Number>( dataTO.getDateAsString(), (Number)(dataTO.getVolume()/100000) );
+			Data<String, Number> volumeData = new Data<String, Number>( p_selectedHistory.date[beginDateIndex], p_selectedHistory.volume[beginDateIndex]/100000 );
 			volumeSeries.getData().add( volumeData );
 			
-			Data<Date, Number> sma100DayData = new Data<Date, Number>( thisDate, (Number)dataTO.getSimpleMovingAverage(10) );
+			Data<Date, Number> sma100DayData = new Data<Date, Number>( thisDate, p_selectedHistory.getExponentialMovingAverage(10)[beginDateIndex] );
 			sma100DaySeries.getData().add( sma100DayData );
 			
 			beginDateIndex++;
@@ -70,7 +70,7 @@ public class PriceHistoryController {
 		view.populateStockPriceAux( sma100DaySeries );
 	}
 	
-	private Integer findIndexOfDefaultDate( List<DataFeedTO> p_selectedHistory ) {
+	private Integer findIndexOfDefaultDate( PriceHistoryTO p_selectedHistory ) {
 		Date todayDate = DateUtility.getTodayDate();
 		Date beginDate = DateUtility.addYears( todayDate, -1 );
 		
@@ -84,9 +84,9 @@ public class PriceHistoryController {
 	 * @param p_dateToFind
 	 * @return
 	 */
-	private Integer findIndexByDateLinearSearch( List<DataFeedTO> p_selectedHistory, Date p_dateToFind ) {
+	private Integer findIndexByDateLinearSearch( PriceHistoryTO p_selectedHistory, Date p_dateToFind ) {
 		
-		int index = p_selectedHistory.size();
+		int index = p_selectedHistory.numElements;
 		
 		boolean isFound = false;
 		boolean isBefore = false;
@@ -94,8 +94,8 @@ public class PriceHistoryController {
 		while ( !isFound ) {
 			index--;
 			
-			DataFeedTO dataPoint = p_selectedHistory.get( index );
-			isBefore = DateUtility.isBeforeCalendarDate( dataPoint.getDateAsDate(), p_dateToFind );
+			String date =  p_selectedHistory.date[index];
+			isBefore = DateUtility.isBeforeCalendarDate( DateUtility.parseStringToDate(date), p_dateToFind );
 			
 			if ( isBefore == true ) {
 				isFound = true;

@@ -10,6 +10,7 @@ import java.util.List;
 
 import priceHistory.ListedStockTO;
 import priceHistory.dataFeed.DataFeedTO;
+import priceHistory.dataFeed.PriceHistoryTO;
 import utility.DateUtility;
 
 public class ProcedureImplementations {
@@ -56,29 +57,54 @@ public class ProcedureImplementations {
 		return mostRecentPriceDate;
 	}
 	
-	public List<DataFeedTO> searchPriceHistory( String p_ticker, Date p_beginDate, Date p_endDate, Connection p_connection ) throws SQLException {
+	public PriceHistoryTO searchPriceHistory( String p_ticker, Date p_beginDate, Date p_endDate, Connection p_connection ) throws SQLException {
 		
-		List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>(400);
+		//List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>(400);
+		PriceHistoryTO priceHistory = new PriceHistoryTO();
+		
+		int size = 0;
+		
+		PreparedStatement preparedStatement_count = p_connection.prepareStatement(  ProcedureDefinitions.S_PRICEHISTORY_COUNT );
+		preparedStatement_count.setString( 1, p_ticker );
+		preparedStatement_count.setString( 2, DateUtility.parseDateToString(p_beginDate) );
+		preparedStatement_count.setString( 3, DateUtility.parseDateToString(p_endDate) );
+		
+		ResultSet results_count = preparedStatement_count.executeQuery();
+		while ( results_count.next() ) {
+			size = results_count.getInt( "COUNT" );
+		}
+		priceHistory.initialiseArrays( size );
 		
 		PreparedStatement preparedStatement = p_connection.prepareStatement( ProcedureDefinitions.S_PRICEHISTORY );
 		preparedStatement.setString( 1, p_ticker );
 		preparedStatement.setString( 2, DateUtility.parseDateToString(p_beginDate) );
 		preparedStatement.setString( 3, DateUtility.parseDateToString(p_endDate) );
 		
+//		while ( results.next() ) {
+//			DataFeedTO dataTO = new DataFeedTO();
+//			
+//			dataTO.setTicker( results.getString("TICKER") );
+//			dataTO.setDate( results.getString("DATE") );
+//			dataTO.setOpenPrice( results.getBigDecimal("OPENPRICE") );
+//			dataTO.setHighPrice( results.getBigDecimal("HIGHPRICE") );
+//			dataTO.setLowPrice( results.getBigDecimal("LOWPRICE") );
+//			dataTO.setClosePrice( results.getBigDecimal("CLOSEPRICE") );
+//			dataTO.setVolume( results.getInt("VOLUME") );
+//			
+//			priceHistory.add( dataTO );
+//		}
+		int index = 0;
 		ResultSet results = preparedStatement.executeQuery();
 		
 		while ( results.next() ) {
-			DataFeedTO dataTO = new DataFeedTO();
+			priceHistory.date[index] = results.getString("DATE");
+			priceHistory.openPrice[index] = results.getDouble("OPENPRICE");
+			priceHistory.highPrice[index] = results.getDouble("HIGHPRICE");
+			priceHistory.lowPrice[index] = results.getDouble("LOWPRICE");
+			priceHistory.closePrice[index] = results.getDouble("CLOSEPRICE");
+			priceHistory.volume[index] = results.getInt("VOLUME");
 			
-			dataTO.setTicker( results.getString("TICKER") );
-			dataTO.setDate( results.getString("DATE") );
-			dataTO.setOpenPrice( results.getBigDecimal("OPENPRICE") );
-			dataTO.setHighPrice( results.getBigDecimal("HIGHPRICE") );
-			dataTO.setLowPrice( results.getBigDecimal("LOWPRICE") );
-			dataTO.setClosePrice( results.getBigDecimal("CLOSEPRICE") );
-			dataTO.setVolume( results.getInt("VOLUME") );
-			
-			priceHistory.add( dataTO );
+			index++;
 		}
 		
 		return priceHistory;

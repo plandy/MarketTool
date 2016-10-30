@@ -7,38 +7,14 @@ import java.util.List;
 
 import database.PoolableConnection;
 import priceHistory.dataFeed.DataFeedTO;
+import priceHistory.dataFeed.PriceHistoryTO;
 import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
 import utility.DateUtility;
 
 public class PriceHistoryFacade extends DefaultFacade {
 	
-	@Deprecated
-	public List<DataFeedTO> getPriceChartData( String p_ticker, Date p_beginDate, Date p_endDate ) {
-		
-		List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>();
-		
-		PoolableConnection poolableConnection = getDatabaseConnection();
-		
-		try {
-			poolableConnection.beginTransaction();
-			
-			PriceHistoryService priceHistoryService = new PriceHistoryService();
-			
-			priceHistory = priceHistoryService.getPriceChartData( p_ticker, p_beginDate, p_endDate, poolableConnection );
-			
-			poolableConnection.commitTransaction();
-		} catch ( SQLException e ) {
-			poolableConnection.silentRollback();
-		} finally {
-			poolableConnection.returnToPool();
-		}
-		
-		return priceHistory;
-		
-	}
-	
-	public List<DataFeedTO> getAllPriceHistory( String p_ticker ) {
-		List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>();
+	public PriceHistoryTO getAllPriceHistory( String p_ticker ) {
+		PriceHistoryTO priceHistory = new PriceHistoryTO();
 		
 		PoolableConnection poolableConnection = getDatabaseConnection();
 		

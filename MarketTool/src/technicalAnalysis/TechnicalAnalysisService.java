@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import priceHistory.dataFeed.DataFeedTO;
+import priceHistory.dataFeed.PriceHistoryTO;
 
 public class TechnicalAnalysisService {
 	
@@ -20,37 +21,40 @@ public class TechnicalAnalysisService {
 	 * @param p_numDays
 	 * @param p_priceHistory
 	 */
-	public void calculateSimpleMovingAverage( int p_numDays, List<DataFeedTO> p_priceHistory ) {
+	public void calculateSimpleMovingAverage( int p_numDays, PriceHistoryTO p_priceHistory ) {
 		
-		BigDecimal movingAverage = new BigDecimal( 0 );
-		BigDecimal numDays = new BigDecimal( p_numDays );
-		int size = p_priceHistory.size() - 1;
-		int reverseIndex = size;
+		double movingAverage = 0;
+		double numDays = (double) p_numDays;
+		int size = p_priceHistory.numElements - 1;
+		int reverseIndex = p_priceHistory.numElements - 1;
 		boolean firstAverage = true;
 		
+		double[] movingAverageArray = new double[p_priceHistory.numElements];
+		
 		while ( reverseIndex > p_numDays ) {
-			DataFeedTO currentDataPoint = p_priceHistory.get( reverseIndex );
 			
 			if ( firstAverage ) {
-				movingAverage = movingAverage.add( currentDataPoint.getClosePrice() );
+				movingAverage += p_priceHistory.closePrice[reverseIndex];
 				if ( reverseIndex == (size - p_numDays) ) {
-					movingAverage = ( movingAverage.divide(numDays) );
+					movingAverage /= numDays;
 					firstAverage = false;
 					
-					p_priceHistory.get( reverseIndex + p_numDays ).setSimpleMovingAverage( p_numDays, movingAverage );
+					movingAverageArray[reverseIndex + p_numDays] = movingAverage;
 				}
 			} else {
 				
-				BigDecimal addition = currentDataPoint.getClosePrice().divide( numDays );
-				BigDecimal subtraction = p_priceHistory.get( reverseIndex + p_numDays ).getClosePrice().divide( numDays );
-				movingAverage = movingAverage.add( addition ).subtract( subtraction );
+				double addition = p_priceHistory.closePrice[reverseIndex] / numDays;
+				double subtraction = p_priceHistory.closePrice[reverseIndex + p_numDays] / numDays;
+				movingAverage += addition - subtraction;
 				
-				p_priceHistory.get( reverseIndex + p_numDays ).setSimpleMovingAverage( p_numDays, movingAverage );
+				movingAverageArray[reverseIndex + p_numDays] = movingAverage;
 			}
 			
 			reverseIndex--;
 			
 		}
+		
+		p_priceHistory.setSimpleMovingAverage( p_numDays, movingAverageArray );
 		
 	}
 	
@@ -63,41 +67,40 @@ public class TechnicalAnalysisService {
 	 * @param p_numDays
 	 * @param p_priceHistory
 	 */
-	public void calculateExponentialMovingAverage( int p_numDays, List<DataFeedTO> p_priceHistory ) {
-		BigDecimal movingAverage = new BigDecimal( 0 );
-		BigDecimal previousAverage = new BigDecimal( 0 );
-		BigDecimal numDays = new BigDecimal( p_numDays );
-		double x = p_numDays;
-		double y = 2 / (x+1);
-		BigDecimal alpha = new BigDecimal( y );
+	public void calculateExponentialMovingAverage( int p_numDays, PriceHistoryTO p_priceHistory ) {
+		double movingAverage = 0;
+		double previousAverage = 0;
+		double numDays = (double)p_numDays;
+		double alpha = 2 / (numDays+1);
+		double[] movingAverageArray = new double[p_priceHistory.numElements];
 		
-		int size = p_priceHistory.size() - 1;
+		int size = p_priceHistory.numElements - 1;
 		int index = 0;
 		
 		boolean firstAverage = true;
 		
 		while ( index < size ) {
-			DataFeedTO currentDataPoint = p_priceHistory.get( index );
 			
 			if ( firstAverage ) {
-				movingAverage = movingAverage.add( currentDataPoint.getClosePrice() );
+				movingAverage += p_priceHistory.closePrice[index];
 				
 				if ( index == (p_numDays - 1) ) {
-					movingAverage = movingAverage.divide( numDays );
+					movingAverage /= numDays;
 					
 					previousAverage = movingAverage;
-					currentDataPoint.setExponentialMovingAverage( p_numDays, movingAverage );
+					movingAverageArray[index] = movingAverage;
 					
 					firstAverage = false;
 				}
 			} else {
-				movingAverage = previousAverage.add( alpha.multiply(currentDataPoint.getClosePrice().subtract(previousAverage)) );
+				movingAverage = previousAverage + alpha * ( p_priceHistory.closePrice[index] - previousAverage );
 				
 				previousAverage = movingAverage;
-				currentDataPoint.setExponentialMovingAverage( p_numDays, movingAverage );
+				movingAverageArray[index] = movingAverage;
 			}
 			index++;
 		}
 		
+		p_priceHistory.setExponentialMovingAverage( p_numDays, movingAverageArray );
 	}
 }

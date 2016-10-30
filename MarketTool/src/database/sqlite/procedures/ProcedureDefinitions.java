@@ -33,6 +33,12 @@ public class ProcedureDefinitions {
 			+ "and date(DATE) < ? "
 			+ "order by DATE asc ";
 	
+	public static final String S_PRICEHISTORY_COUNT = "select count(*) as COUNT "
+			+ "from PRICEHISTORY "
+			+ "where TICKER = ? "
+			+ "and date(DATE) > ? "
+			+ "and date(DATE) < ? ";
+	
 	public static final String GET_MOSTRECENT_PRICEHISTORY_DATE = "select max(DATE) as DATE from PRICEHISTORY where TICKER = ? ";
 	
 	public static final String I_DATAREQUESTHISTORY = "insert into DATAREQUESTHISTORY "

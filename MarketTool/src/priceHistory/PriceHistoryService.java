@@ -8,6 +8,7 @@ import applicationConstants.InitialListedStocks;
 import database.PoolableConnection;
 import database.sqlite.procedures.ProcedureImplementations;
 import priceHistory.dataFeed.DataFeedTO;
+import priceHistory.dataFeed.PriceHistoryTO;
 import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
 import utility.DateUtility;
 
@@ -15,8 +16,8 @@ public class PriceHistoryService {
 	
 	ProcedureImplementations databaseProc = new ProcedureImplementations();
 	
-	public List<DataFeedTO> getAllPriceHistory( String p_ticker, PoolableConnection p_connection ) throws SQLException {
-		List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>();
+	public PriceHistoryTO getAllPriceHistory( String p_ticker, PoolableConnection p_connection ) throws SQLException {
+		PriceHistoryTO priceHistory = new PriceHistoryTO();
 			
 		Date mostRecentPriceDate = databaseProc.getMostRecentPricehistoryDate( p_ticker, p_connection );
 			
@@ -52,32 +53,6 @@ public class PriceHistoryService {
 			List<DataFeedTO> missingHistory = yahooDataRequest.getPriceHistory();
 			databaseProc.insertPriceHistory( p_ticker, missingHistory, p_connection );
 		}
-	}
-	
-	@Deprecated
-	public List<DataFeedTO> getPriceChartData( String p_ticker, Date p_beginDate, Date p_endDate, PoolableConnection p_connection ) throws SQLException {
-		
-		List<DataFeedTO> priceHistory = new ArrayList<DataFeedTO>();
-			
-		priceHistory = databaseProc.searchPriceHistory( p_ticker, p_beginDate, p_endDate, p_connection );
-			
-		Date mostRecentPriceDate = databaseProc.getMostRecentPricehistoryDate( p_ticker, p_connection );
-		Date l_todayDate = DateUtility.getTodayDate();
-		//String mostRecentRequestDateString = priceHistoryService.getMostRecentRequestDate( p_ticker, poolableConnection );
-		String mostRecentRequestDateString = "";
-		if ( mostRecentPriceDate.before(l_todayDate) ) {
-			if ( mostRecentRequestDateString.isEmpty() || (!mostRecentRequestDateString.isEmpty() && DateUtility.isBeforeCalendarDate(DateUtility.parseStringToDate(mostRecentRequestDateString), l_todayDate)) ) {
-				mostRecentPriceDate = DateUtility.addDays( mostRecentPriceDate, 1 );
-				YahooDataRequest yahooDataRequest = new YahooDataRequest( p_ticker, mostRecentPriceDate );
-				databaseProc.insertDataRequestHistory( p_ticker, l_todayDate, p_connection );
-				List<DataFeedTO> missingHistory = yahooDataRequest.getPriceHistory();
-				databaseProc.insertPriceHistory( p_ticker, missingHistory, p_connection );
-				priceHistory.addAll( missingHistory );
-			}
-		}
-			
-		return priceHistory;
-		
 	}
 	
 	public List<ListedStockTO> getListedStocks( PoolableConnection p_connection ) throws SQLException {
