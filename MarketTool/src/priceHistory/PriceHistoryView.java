@@ -1,16 +1,19 @@
 package priceHistory;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import applicationConstants.StringConstants;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -32,6 +35,9 @@ public class PriceHistoryView extends BorderPane {
 	private ListView<ListedStockTO> stockListView;
 	private ListView<ListedStockTO> stockWatchlistListView;
 	
+	private BorderPane vbox;
+	public ListView<CheckBox> checkBoxListView;
+	
 	private GridPane chartAreaPane;
 	private LineChart<Date,Number> stockPriceChart;
 	private BarChart<String,Number> stockVolumeChart;
@@ -49,8 +55,35 @@ public class PriceHistoryView extends BorderPane {
 	}
 	
 	private void createComponents() {
-		createStockListTabPane();
+		createVBox();
 		createChartAreaPane();
+	}
+	
+	private void createVBox() {
+		vbox = new BorderPane();
+		createStockListTabPane();
+		vbox.setTop( stockListTabPane );
+		
+		checkBoxListView = new ListView<CheckBox>();
+		checkBoxListView.setItems( createCheckboxList() );
+		vbox.setBottom( checkBoxListView );
+	}
+	
+	private ObservableList<CheckBox> createCheckboxList() {
+		ArrayList<CheckBox> arrayList = new ArrayList<CheckBox>();
+		
+		CheckBox SMA_10Day = new CheckBox( "10-day SMA" );
+		SMA_10Day.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				controller.notify_SMA_10Day( newValue );
+			}
+			
+		});
+		arrayList.add( SMA_10Day );
+		
+		return FXCollections.observableArrayList( arrayList );
 	}
 	
 	private void initialiseComponents() {
@@ -59,11 +92,12 @@ public class PriceHistoryView extends BorderPane {
 	}
 	
 	private void layoutComponents() {
-		super.setLeft( stockListTabPane );
+		super.setLeft( vbox );
 		super.setCenter( chartAreaPane );
 		
 		layoutStockListTabPane();
 		layoutChartAreaPane();
+		layoutVBox();
 	}
 	
 	private void addStockListListeners() {
@@ -138,6 +172,10 @@ public class PriceHistoryView extends BorderPane {
 		
 		createStockListView();
 		createStockWatchlistListView();
+	}
+	
+	private void layoutVBox( ) {
+		
 	}
 	
 	private void layoutStockListTabPane(){
@@ -239,6 +277,10 @@ public class PriceHistoryView extends BorderPane {
 	
 	public void populateStockPriceAux( XYChart.Series<Date, Number> p_auxSeries ) {
 		stockPriceChart.getData().add( p_auxSeries );
+	}
+	
+	public void removeStockPriceAux( XYChart.Series<Date, Number> p_auxSeries ) {
+		stockPriceChart.getData().remove( p_auxSeries );
 	}
 
 }

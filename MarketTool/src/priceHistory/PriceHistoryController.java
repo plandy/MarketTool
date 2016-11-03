@@ -1,12 +1,14 @@
 package priceHistory;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
+import javafx.scene.control.CheckBox;
 import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.PriceHistoryTO;
 import technicalAnalysis.TechnicalAnalysisFacade;
@@ -18,6 +20,10 @@ public class PriceHistoryController {
 	private PriceHistoryView view;
 	
 	private PriceHistoryTO selectedHistory;
+	
+	private int beginDateIndex = 0;
+	
+	private HashMap<String, XYChart.Series<Date, Number>> technicalAnalysisCache = new HashMap<String, XYChart.Series<Date, Number>>();
 	
 	public PriceHistoryController( PriceHistoryView p_view ) {
 		service = new PriceHistoryFacade();
@@ -40,34 +46,27 @@ public class PriceHistoryController {
 	private void showBasicHistory( PriceHistoryTO p_selectedHistory ) {
 		XYChart.Series<Date, Number> closePriceSeries = new XYChart.Series<>();
 		XYChart.Series<String, Number> volumeSeries = new XYChart.Series<>();
-		XYChart.Series<Date, Number> sma100DaySeries = new XYChart.Series<>();
 		
-		int beginDateIndex = findIndexOfDefaultDate( p_selectedHistory ).intValue();
-		
-		TechnicalAnalysisFacade techFacade = new TechnicalAnalysisFacade();
-		techFacade.calculateExponentialMovingAverage_10Day( p_selectedHistory );
+		beginDateIndex = findIndexOfDefaultDate( p_selectedHistory ).intValue();
+		int index = beginDateIndex;
 		
 		Date thisDate;
 		
-		while ( beginDateIndex < p_selectedHistory.numElements - 1 ) {
-			thisDate = DateUtility.parseStringToDate( p_selectedHistory.date[beginDateIndex] );
+		while ( index < p_selectedHistory.numElements - 1 ) {
+			thisDate = DateUtility.parseStringToDate( p_selectedHistory.date[index] );
 			
-			Data<Date, Number> priceData = new Data<Date, Number>( thisDate, p_selectedHistory.closePrice[beginDateIndex] );
+			Data<Date, Number> priceData = new Data<Date, Number>( thisDate, p_selectedHistory.closePrice[index] );
 			closePriceSeries.getData().add( priceData );
 			
-			Data<String, Number> volumeData = new Data<String, Number>( p_selectedHistory.date[beginDateIndex], p_selectedHistory.volume[beginDateIndex]/100000 );
+			Data<String, Number> volumeData = new Data<String, Number>( p_selectedHistory.date[index], p_selectedHistory.volume[index]/100000 );
 			volumeSeries.getData().add( volumeData );
 			
-			Data<Date, Number> sma100DayData = new Data<Date, Number>( thisDate, p_selectedHistory.getExponentialMovingAverage(10)[beginDateIndex] );
-			sma100DaySeries.getData().add( sma100DayData );
-			
-			beginDateIndex++;
+			index++;
 		}
 		
 		view.populateStockPriceChart( closePriceSeries );
 		view.populateStockVolumeChart( volumeSeries );
 		
-		view.populateStockPriceAux( sma100DaySeries );
 	}
 	
 	private Integer findIndexOfDefaultDate( PriceHistoryTO p_selectedHistory ) {
@@ -128,6 +127,38 @@ public class PriceHistoryController {
 		}
 		
 		return index;
+	}
+
+	public void notify_SMA_10Day(Boolean newValue) {
+		if ( newValue == true ) {
+			XYChart.Series<Date, Number> sma100DaySeries = new XYChart.Series<>();
+			
+			TechnicalAnalysisFacade techFacade = new TechnicalAnalysisFacade();
+			techFacade.calculateExponentialMovingAverage_10Day( selectedHistory );
+			
+			Date thisDate;
+			int index = beginDateIndex;
+			while ( index < selectedHistory.numElements - 1 ) {
+				thisDate = DateUtility.parseStringToDate( selectedHistory.date[index] );				
+				
+				Data<Date, Number> sma100DayData = new Data<Date, Number>( thisDate, selectedHistory.getExponentialMovingAverage(10)[index] );
+				sma100DaySeries.getData().add( sma100DayData );
+				
+				index++;
+			}
+			
+			technicalAnalysisCache.put( "SMA_10Day", sma100DaySeries );
+			view.populateStockPriceAux( sma100DaySeries );
+		} else if ( newValue == false ) {
+			view.removeStockPriceAux( technicalAnalysisCache.get("SMA_10Day") );
+		}
+		
+	}
+	
+	private void resetSelections() {
+		for ( CheckBox checkBox : view.checkBoxListView.getItems() ) {
+			checkBox.setSelected( false );
+		}
 	}
 
 }
