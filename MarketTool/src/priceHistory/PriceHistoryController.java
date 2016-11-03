@@ -37,6 +37,7 @@ public class PriceHistoryController {
 	
 	public void selectStock( String p_ticker ) {
 		selectedHistory = null;
+		resetSelections();
 		
 		selectedHistory = service.getAllPriceHistory( p_ticker );
 		
