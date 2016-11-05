@@ -4,9 +4,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import priceHistory.PriceHistoryView;
 import utility.SystemInformationUtility;
 import view.menuBar.TopMenuBar;
+import view.priceHistory.PriceHistoryMainView;
 
 public class Root extends Application {
 	
@@ -25,7 +25,7 @@ public class Root extends Application {
 		Scene l_scene = new Scene(root);
 	
 		root.getChildren().addAll( new TopMenuBar( primaryStage ) );
-		root.getChildren().add( new PriceHistoryView() );
+		root.getChildren().add( new PriceHistoryMainView() );
 		
 		primaryStage.setScene( l_scene );
 		primaryStage.setMaximized(true);

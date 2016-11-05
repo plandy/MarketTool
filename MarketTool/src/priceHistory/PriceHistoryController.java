@@ -13,11 +13,13 @@ import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.PriceHistoryTO;
 import technicalAnalysis.TechnicalAnalysisFacade;
 import utility.DateUtility;
+import view.BaseMainView;
+import view.priceHistory.PriceHistoryMainView;
 
 public class PriceHistoryController {
 	
 	private PriceHistoryFacade service;
-	private PriceHistoryView view;
+	private PriceHistoryMainView view;
 	
 	private PriceHistoryTO selectedHistory;
 	
@@ -25,7 +27,7 @@ public class PriceHistoryController {
 	
 	private HashMap<String, XYChart.Series<Date, Number>> technicalAnalysisCache = new HashMap<String, XYChart.Series<Date, Number>>();
 	
-	public PriceHistoryController( PriceHistoryView p_view ) {
+	public PriceHistoryController( PriceHistoryMainView p_view ) {
 		service = new PriceHistoryFacade();
 		view = p_view;
 	}
