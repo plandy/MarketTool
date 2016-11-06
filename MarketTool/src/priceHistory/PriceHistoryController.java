@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import applicationConstants.StringConstants;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
@@ -132,34 +133,33 @@ public class PriceHistoryController {
 		return index;
 	}
 
-	public void notify_SMA_10Day(Boolean newValue) {
+	public void notify_EMA( Boolean newValue, int p_numDays ) {
 		if ( newValue == true ) {
-			XYChart.Series<Date, Number> sma100DaySeries = new XYChart.Series<>();
+			XYChart.Series<Date, Number> emaSeries = new XYChart.Series<>();
 			
 			TechnicalAnalysisFacade techFacade = new TechnicalAnalysisFacade();
-			techFacade.calculateExponentialMovingAverage_10Day( selectedHistory );
+			techFacade.calculateExponentialMovingAverage( selectedHistory, p_numDays );
 			
 			Date thisDate;
 			int index = beginDateIndex;
 			while ( index < selectedHistory.numElements - 1 ) {
 				thisDate = DateUtility.parseStringToDate( selectedHistory.date[index] );				
 				
-				Data<Date, Number> sma100DayData = new Data<Date, Number>( thisDate, selectedHistory.getExponentialMovingAverage(10)[index] );
-				sma100DaySeries.getData().add( sma100DayData );
+				Data<Date, Number> emaDayData = new Data<Date, Number>( thisDate, selectedHistory.getExponentialMovingAverage(p_numDays)[index] );
+				emaSeries.getData().add( emaDayData );
 				
 				index++;
 			}
-			
-			technicalAnalysisCache.put( "SMA_10Day", sma100DaySeries );
-			view.populateStockPriceAux( sma100DaySeries );
+			technicalAnalysisCache.put( StringConstants.EXPONENTIALMOVINGAVERAGE_DAYS + p_numDays, emaSeries );
+			view.populateStockPriceAux( emaSeries );
 		} else if ( newValue == false ) {
-			view.removeStockPriceAux( technicalAnalysisCache.get("SMA_10Day") );
+			view.removeStockPriceAux( technicalAnalysisCache.get(StringConstants.EXPONENTIALMOVINGAVERAGE_DAYS + p_numDays) );
 		}
 		
 	}
 	
 	private void resetSelections() {
-		for ( CheckBox checkBox : view.checkBoxListView.getItems() ) {
+		for ( CheckBox checkBox : view.techAnalysisSelectionListView.getItems() ) {
 			checkBox.setSelected( false );
 		}
 	}

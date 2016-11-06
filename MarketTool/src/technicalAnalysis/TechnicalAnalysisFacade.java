@@ -13,6 +13,16 @@ public class TechnicalAnalysisFacade {
 		service = new TechnicalAnalysisService();
 	}
 	
+	/**
+	 * Calculates a Simple Moving Average for the given period
+	 * 
+	 * @param p_priceHistory
+	 * @param p_numDays
+	 */
+	public void calculateSimpleMovingAverage( PriceHistoryTO p_priceHistory, int p_numDays ) {
+		service.calculateSimpleMovingAverage( p_numDays, p_priceHistory );
+	}
+	
 	public void calculateSimpleMovingAverage_10Day( PriceHistoryTO p_priceHistory ) {
 		int numDays = 10;
 		service.calculateSimpleMovingAverage( numDays, p_priceHistory );
@@ -36,6 +46,16 @@ public class TechnicalAnalysisFacade {
 	public void calculateSimpleMovingAverage_200Day( PriceHistoryTO p_priceHistory ) {
 		int numDays = 200;
 		service.calculateSimpleMovingAverage( numDays, p_priceHistory );
+	}
+	
+	/**
+	 * Calculates an Exponential Moving Average for the given period
+	 * 
+	 * @param p_priceHistory
+	 * @param p_numDays
+	 */
+	public void calculateExponentialMovingAverage( PriceHistoryTO p_priceHistory, int p_numDays ) {
+		service.calculateExponentialMovingAverage( p_numDays, p_priceHistory );
 	}
 	
 	public void calculateExponentialMovingAverage_10Day( PriceHistoryTO p_priceHistory ) {

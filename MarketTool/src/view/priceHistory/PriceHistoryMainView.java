@@ -1,15 +1,9 @@
 package view.priceHistory;
 
-import java.util.ArrayList;
 import java.util.Date;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -24,7 +18,7 @@ public class PriceHistoryMainView extends BaseMainView {
 	private StocklistView stocklistView;
 	
 	private BorderPane vbox;
-	public ListView<CheckBox> checkBoxListView;
+	public TechnicalAnalysisSelectionView techAnalysisSelectionListView;
 	
 	private GridPane chartAreaPane;
 	private StockPriceChart stockPriceChart;
@@ -52,26 +46,8 @@ public class PriceHistoryMainView extends BaseMainView {
 		stocklistView = new StocklistView( controller );
 		vbox.setTop( stocklistView );
 		
-		checkBoxListView = new ListView<CheckBox>();
-		checkBoxListView.setItems( createCheckboxList() );
-		vbox.setBottom( checkBoxListView );
-	}
-	
-	private ObservableList<CheckBox> createCheckboxList() {
-		ArrayList<CheckBox> arrayList = new ArrayList<CheckBox>();
-		
-		CheckBox SMA_10Day = new CheckBox( "10-day SMA" );
-		SMA_10Day.selectedProperty().addListener(new ChangeListener<Boolean>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				controller.notify_SMA_10Day( newValue );
-			}
-			
-		});
-		arrayList.add( SMA_10Day );
-		
-		return FXCollections.observableArrayList( arrayList );
+		techAnalysisSelectionListView = new TechnicalAnalysisSelectionView( controller );
+		vbox.setBottom( techAnalysisSelectionListView );
 	}
 	
 	private void initialiseComponents() {
