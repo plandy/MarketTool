@@ -29,6 +29,10 @@ public class TechnicalAnalysisSelectionView extends ListView<CheckBox> {
 		ArrayList<CheckBox> arrayList = new ArrayList<CheckBox>();
 		
 		for ( int day : numDays ) {
+			arrayList.add( createSMAcheckbox(day) );
+		}
+		
+		for ( int day : numDays ) {
 			arrayList.add( createEMAcheckbox(day) );
 		}
 		
@@ -38,6 +42,13 @@ public class TechnicalAnalysisSelectionView extends ListView<CheckBox> {
 	public CheckBox createEMAcheckbox( int p_numDays ) {
 		CheckBox checkBox = new CheckBox( StringConstants.EXPONENTIALMOVINGAVERAGE_DAYS + p_numDays );
 		checkBox.selectedProperty().addListener( new NotifyEMA_Listener(p_numDays, controller) );
+		
+		return checkBox;
+	}
+	
+	public CheckBox createSMAcheckbox( int p_numDays ) {
+		CheckBox checkBox = new CheckBox( StringConstants.SIMPLEMOVINGAVERAGE_DAYS + p_numDays );
+		checkBox.selectedProperty().addListener( new NotifySMA_Listener(p_numDays, controller) );
 		
 		return checkBox;
 	}
@@ -54,6 +65,21 @@ public class TechnicalAnalysisSelectionView extends ListView<CheckBox> {
 		@Override
 		public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 			l_controller.notify_EMA( newValue, l_numDays );
+		}
+	}
+	
+	private class NotifySMA_Listener implements ChangeListener<Boolean> {
+		PriceHistoryController l_controller;
+		private int l_numDays;
+		
+		public NotifySMA_Listener( int p_numDays, PriceHistoryController p_controller ) {
+			l_controller = p_controller;
+			l_numDays = p_numDays;
+		}
+
+		@Override
+		public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+			l_controller.notify_SMA( newValue, l_numDays );
 		}
 	}
 }

@@ -158,6 +158,31 @@ public class PriceHistoryController {
 		
 	}
 	
+	public void notify_SMA( Boolean newValue, int p_numDays ) {
+		if ( newValue == true ) {
+			XYChart.Series<Date, Number> smaSeries = new XYChart.Series<>();
+			
+			TechnicalAnalysisFacade techFacade = new TechnicalAnalysisFacade();
+			techFacade.calculateSimpleMovingAverage( selectedHistory, p_numDays );
+			
+			Date thisDate;
+			int index = beginDateIndex;
+			while ( index < selectedHistory.numElements - 1 ) {
+				thisDate = DateUtility.parseStringToDate( selectedHistory.date[index] );				
+				
+				Data<Date, Number> smaDayData = new Data<Date, Number>( thisDate, selectedHistory.getSimpleMovingAverage(p_numDays)[index] );
+				smaSeries.getData().add( smaDayData );
+				
+				index++;
+			}
+			technicalAnalysisCache.put( StringConstants.SIMPLEMOVINGAVERAGE_DAYS + p_numDays, smaSeries );
+			view.populateStockPriceAux( smaSeries );
+		} else if ( newValue == false ) {
+			view.removeStockPriceAux( technicalAnalysisCache.get(StringConstants.SIMPLEMOVINGAVERAGE_DAYS + p_numDays) );
+		}
+		
+	}
+	
 	private void resetSelections() {
 		for ( CheckBox checkBox : view.techAnalysisSelectionListView.getItems() ) {
 			checkBox.setSelected( false );
