@@ -1,8 +1,5 @@
 package technicalAnalysis;
 
-import java.util.List;
-
-import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.PriceHistoryTO;
 
 public class TechnicalAnalysisFacade {

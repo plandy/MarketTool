@@ -2,14 +2,10 @@ package priceHistory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import database.PoolableConnection;
-import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.PriceHistoryTO;
-import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
-import utility.DateUtility;
 
 public class PriceHistoryFacade extends DefaultFacade {
 	

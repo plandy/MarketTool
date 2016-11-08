@@ -14,7 +14,6 @@ import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.PriceHistoryTO;
 import technicalAnalysis.TechnicalAnalysisFacade;
 import utility.DateUtility;
-import view.BaseMainView;
 import view.priceHistory.PriceHistoryMainView;
 
 public class PriceHistoryController {

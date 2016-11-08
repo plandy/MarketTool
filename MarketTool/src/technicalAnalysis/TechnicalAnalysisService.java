@@ -1,9 +1,5 @@
 package technicalAnalysis;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.PriceHistoryTO;
 
 public class TechnicalAnalysisService {
