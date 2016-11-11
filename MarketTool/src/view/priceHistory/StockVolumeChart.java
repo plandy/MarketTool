@@ -3,8 +3,9 @@ package view.priceHistory;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import view.IUIControl;
 
-public class StockVolumeChart extends BarChart<String,Number> {
+public class StockVolumeChart extends BarChart<String,Number> implements IUIControl {
 	
 	private CategoryAxis xDateAxis;
     private NumberAxis yPriceAxis ;
@@ -15,10 +16,11 @@ public class StockVolumeChart extends BarChart<String,Number> {
 		xDateAxis = (CategoryAxis) super.getXAxis();
 		yPriceAxis = (NumberAxis) super.getYAxis();
 		
-		SetDefaultStyle();
+		setDefaultStyle();
 	}
 	
-	private void SetDefaultStyle() {
+	@Override
+	public void setDefaultStyle() {
 		xDateAxis.setTickLabelsVisible(false);
 		xDateAxis.setTickMarkVisible(false);
 		

@@ -4,9 +4,10 @@ import java.util.Date;
 
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import view.IUIControl;
 import view.javaFXChart.DateAxis;
 
-public class StockPriceChart extends LineChart<Date,Number> {
+public class StockPriceChart extends LineChart<Date,Number> implements IUIControl {
 	
 	private DateAxis xDateAxis;
 	private NumberAxis yPriceAxis;
@@ -20,7 +21,8 @@ public class StockPriceChart extends LineChart<Date,Number> {
 		setDefaultStyle();
 	}
 	
-	private void setDefaultStyle() {
+	@Override
+	public void setDefaultStyle() {
 		yPriceAxis.setForceZeroInRange(false);
 		
 		this.setAnimated(false);
