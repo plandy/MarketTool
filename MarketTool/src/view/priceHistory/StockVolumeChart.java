@@ -7,8 +7,8 @@ import view.IUIControl;
 
 public class StockVolumeChart extends BarChart<String,Number> implements IUIControl {
 	
-	private CategoryAxis xDateAxis;
-    private NumberAxis yPriceAxis ;
+	final private CategoryAxis xDateAxis;
+    final private NumberAxis yPriceAxis;
 
 	public StockVolumeChart() {
 		super( new CategoryAxis(), new NumberAxis() );

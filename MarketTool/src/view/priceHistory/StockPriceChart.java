@@ -9,8 +9,8 @@ import view.javaFXChart.DateAxis;
 
 public class StockPriceChart extends LineChart<Date,Number> implements IUIControl {
 	
-	private DateAxis xDateAxis;
-	private NumberAxis yPriceAxis;
+	final private DateAxis xDateAxis;
+	final private NumberAxis yPriceAxis;
 	
 	public StockPriceChart() {
 		super( new DateAxis(), new NumberAxis() );

@@ -19,17 +19,21 @@ public class PriceHistoryService {
 	public PriceHistoryTO getAllPriceHistory( String p_ticker, PoolableConnection p_connection ) throws SQLException {
 		PriceHistoryTO priceHistory = new PriceHistoryTO();
 			
-		Date mostRecentPriceDate = databaseProc.getMostRecentPricehistoryDate( p_ticker, p_connection );
+		getHistoryFromDataFeed( p_ticker, p_connection );
 			
+		priceHistory = databaseProc.searchPriceHistory( p_ticker, new Date(0), DateUtility.getTodayDate(), p_connection );
+		
+		return priceHistory;
+	}
+	
+	public void getHistoryFromDataFeed( String p_ticker, PoolableConnection p_connection ) throws SQLException {
+		Date mostRecentPriceDate = databaseProc.getMostRecentPricehistoryDate( p_ticker, p_connection );
+		
 		if ( mostRecentPriceDate == null ) {
 			initialisePriceHistory( p_ticker, p_connection );
 		} else {
 			getMissingHistoryFromDataFeed( p_ticker, mostRecentPriceDate, p_connection );
 		}
-			
-		priceHistory = databaseProc.searchPriceHistory( p_ticker, new Date(0), DateUtility.getTodayDate(), p_connection );
-		
-		return priceHistory;
 	}
 	
 	public void initialisePriceHistory( String p_ticker, PoolableConnection p_connection ) throws SQLException {

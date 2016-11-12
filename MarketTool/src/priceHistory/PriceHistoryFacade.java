@@ -70,5 +70,23 @@ public class PriceHistoryFacade extends DefaultFacade {
 		
 		return listedStocks;
 	}
+	
+	public void getHistoryFromDataFeed( String p_ticker ) {
+		PoolableConnection poolableConnection = getDatabaseConnection();
+		
+		try {
+			poolableConnection.beginTransaction();
+			
+			PriceHistoryService priceHistoryService = new PriceHistoryService();
+			priceHistoryService.getHistoryFromDataFeed( p_ticker, poolableConnection );
+			
+			poolableConnection.commitTransaction();
+		} catch ( SQLException e ) {
+			poolableConnection.silentRollback();
+			throw new RuntimeException();
+		} finally {
+			poolableConnection.returnToPool();
+		}
+	}
 
 }

@@ -8,7 +8,7 @@ import javafx.scene.control.MenuItem;
 
 public class ClearAllDataItem extends MenuItem {
 	public ClearAllDataItem() {
-		super( StringConstants.DATA_CLEARALLDATA_TITLE );
+		super( StringConstants.DATABASE_CLEARALLDATA_TITLE );
 		
 		this.setOnAction( new EventHandler<ActionEvent>() {
 			

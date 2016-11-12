@@ -9,7 +9,7 @@ import javafx.scene.control.MenuItem;
 public class InitialiseDatabaseItem extends MenuItem {
 	
 	public InitialiseDatabaseItem() {
-		super( StringConstants.DATA_INITIALISEDB_TITLE );
+		super( StringConstants.DATABASE_INITIALISEDB_TITLE );
 		
 		this.setOnAction( new EventHandler<ActionEvent>() {
 			@Override
