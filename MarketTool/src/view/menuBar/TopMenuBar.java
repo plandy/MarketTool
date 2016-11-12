@@ -8,7 +8,7 @@ import view.menuBar.fileMenu.FileMenu;
 
 public class TopMenuBar extends MenuBar {
 	
-	public TopMenuBar ( Stage p_primaryStage ) {
+	public TopMenuBar () {
 		
 		this.getMenus().add( new FileMenu() );
 		this.getMenus().add( new DatabaseMenu() );

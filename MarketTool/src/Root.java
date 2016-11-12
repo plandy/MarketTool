@@ -24,7 +24,7 @@ public class Root extends Application {
 		root.setAlignment(Pos.TOP_CENTER);
 		Scene l_scene = new Scene(root);
 	
-		root.getChildren().addAll( new TopMenuBar( primaryStage ) );
+		root.getChildren().addAll( new TopMenuBar() );
 		root.getChildren().add( new PriceHistoryMainView() );
 		
 		primaryStage.setScene( l_scene );
