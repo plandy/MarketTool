@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import utility.logger.Log;
+
 public class PoolableConnection implements Connection {
 	
 	private ConnectionPool pool;
@@ -38,7 +40,7 @@ public class PoolableConnection implements Connection {
 	public void silentRollback() {
 		try {
 			rollback();
-			System.out.println("silent rollback");
+			Log.debug( "silent rollback" );
 		} catch (SQLException e) {
 			throw new RuntimeException("Database rollback failure");
 		}

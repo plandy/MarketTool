@@ -12,6 +12,7 @@ import priceHistory.ListedStockTO;
 import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.PriceHistoryTO;
 import utility.DateUtility;
+import utility.logger.Log;
 
 public class ProcedureImplementations {
 	
@@ -48,7 +49,7 @@ public class ProcedureImplementations {
 		
 		while ( results.next() ) {
 			dateString = results.getString("DATE");
-			System.out.println("most recent date " +p_ticker+ " : " + dateString);
+			Log.info( "most recent date " +p_ticker+ " : " + dateString );
 		}
 		if ( dateString != null ) {
 			mostRecentPriceDate = DateUtility.parseStringToDate( dateString );

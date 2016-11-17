@@ -15,6 +15,7 @@ import java.util.List;
 
 import priceHistory.dataFeed.DataFeedTO;
 import utility.DateUtility;
+import utility.logger.Log;
 
 public class YahooDataRequest {
 	
@@ -41,7 +42,7 @@ public class YahooDataRequest {
 		
 		Instant end = Instant.now();
 		
-		System.out.println( "Total data request duration: " + Duration.between(start, end).getNano() );
+		Log.info( "Total data request duration: " + Duration.between(start, end).getNano() );
 		
 	}
 	
@@ -56,7 +57,7 @@ public class YahooDataRequest {
 		
 		Instant end = Instant.now();
 		
-		System.out.println( "Total data request duration: " + Duration.between(start, end).getNano() );
+		Log.info( "Total data request duration: " + Duration.between(start, end).getNano() );
 		
 	}
 	
@@ -69,7 +70,7 @@ public class YahooDataRequest {
 		
 		Instant end = Instant.now();
 		
-		System.out.println( "Total data request duration: " + Duration.between(start, end).getNano() );
+		Log.info( "Total data request duration: " + Duration.between(start, end).getNano() );
 		
 	}
 	
@@ -105,14 +106,14 @@ public class YahooDataRequest {
 			URL l_url = null;
 			l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker + beginDateURL+ endDateURL +"g=d&ignore=.csv");
 			
-			System.out.println("Yahoo Data request: " + p_ticker + DateUtility.parseDateToString( p_beginDate ) + DateUtility.parseDateToString( p_endDate ) );
+			Log.info( "Yahoo Data request: " + p_ticker + DateUtility.parseDateToString( p_beginDate ) + DateUtility.parseDateToString( p_endDate ) );
 			Instant start = Instant.now();
 			
 			URLConnection l_connection = l_url.openConnection();
 			InputStreamReader l_stream = new InputStreamReader( l_connection.getInputStream() );
 			
 			Instant end = Instant.now();
-			System.out.println("Connection establish duration: " + Duration.between(start, end).getNano());
+			Log.info("Connection establish duration: " + Duration.between(start, end).getNano());
 			
 			return l_stream;
 			
@@ -163,7 +164,7 @@ public class YahooDataRequest {
 			}
 			
 			Instant end = Instant.now();
-			System.out.println("Data request parse duration: " + Duration.between(start, end).getNano());
+			Log.info("Data request parse duration: " + Duration.between(start, end).getNano());
 			
 			setPriceHistory(l_priceHistory);
 			
