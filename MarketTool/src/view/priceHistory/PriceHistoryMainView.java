@@ -17,7 +17,7 @@ public class PriceHistoryMainView extends BaseMainView {
 	
 	private StocklistView stocklistView;
 	
-	private BorderPane vbox;
+	private GridPane leftPane;
 	public TechnicalAnalysisSelectionView techAnalysisSelectionListView;
 	
 	private GridPane chartAreaPane;
@@ -37,17 +37,26 @@ public class PriceHistoryMainView extends BaseMainView {
 	}
 	
 	private void createComponents() {
-		createVBox();
+		createLeftPane();
 		createChartAreaPane();
 	}
 	
-	private void createVBox() {
-		vbox = new BorderPane();
-		stocklistView = new StocklistView( controller );
-		vbox.setTop( stocklistView );
+	private void createLeftPane() {
+		leftPane = new GridPane();
 		
+		stocklistView = new StocklistView( controller );		
 		techAnalysisSelectionListView = new TechnicalAnalysisSelectionView( controller );
-		vbox.setBottom( techAnalysisSelectionListView );
+		
+		leftPane.add( stocklistView, 0, 0 );
+		leftPane.add( techAnalysisSelectionListView, 0, 1 );
+		
+		RowConstraints row0Constraint = new RowConstraints();
+		row0Constraint.setPercentHeight(60);
+		leftPane.getRowConstraints().add( 0, row0Constraint );
+		
+		RowConstraints row1Constraint = new RowConstraints();
+		row1Constraint.setPercentHeight(40);
+		leftPane.getRowConstraints().add( 1, row1Constraint );
 	}
 	
 	private void initialiseComponents() {
@@ -56,7 +65,7 @@ public class PriceHistoryMainView extends BaseMainView {
 	}
 	
 	private void layoutComponents() {
-		super.setLeft( vbox );
+		super.setLeft( leftPane );
 		super.setCenter( chartAreaPane );
 		
 		layoutChartAreaPane();
