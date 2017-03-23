@@ -2,9 +2,9 @@ package database;
 
 import java.sql.SQLException;
 
-import priceHistory.DefaultFacade;
+import priceHistory.AbstractFacade;
 
-public class DatabaseFacade extends DefaultFacade {
+public class DatabaseFacade extends AbstractFacade {
 	
 	public void initialiseDatabase() {
 		PoolableConnection connection = getDatabaseConnection();

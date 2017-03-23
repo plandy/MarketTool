@@ -7,7 +7,7 @@ import java.util.List;
 import database.PoolableConnection;
 import priceHistory.dataFeed.PriceHistoryTO;
 
-public class PriceHistoryFacade extends DefaultFacade {
+public class PriceHistoryFacade extends AbstractFacade {
 	
 	public PriceHistoryTO getAllPriceHistory( String p_ticker ) {
 		PriceHistoryTO priceHistory = new PriceHistoryTO();
