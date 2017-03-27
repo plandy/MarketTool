@@ -18,23 +18,28 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 import utility.logger.Log;
 
 public class PoolableConnection implements Connection {
 	
-	private ConnectionPool pool;
 	private Connection connection;
+	private AtomicLong ownerId = new AtomicLong(EMPTY_OWNER_VALUE);
 	
-	public PoolableConnection( Connection p_connection, ConnectionPool p_pool ) {
+	private static final long EMPTY_OWNER_VALUE = -1L;
+	
+	public PoolableConnection( Connection p_connection ) {
 		
 		connection = p_connection;
-		pool = p_pool;
-		
 	}
 	
-	public void returnToPool() {
-		pool.returnConnection( this );
+	public boolean compareAndSet( long p_ownerId ) {
+		return ownerId.compareAndSet( EMPTY_OWNER_VALUE, p_ownerId );
+	}
+	
+	public boolean returnToPool() {
+		return ownerId.compareAndSet( ownerId.longValue(), EMPTY_OWNER_VALUE );
 	}
 	
 	public void silentRollback() {
@@ -135,7 +140,7 @@ public class PoolableConnection implements Connection {
 
 	@Override
 	public void close() throws SQLException {
-		pool.returnConnection(this);
+		this.returnToPool();
 	}
 
 	@Override

@@ -3,80 +3,57 @@ package database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ConnectionPool {
 	
-	private BlockingQueue<PoolableConnection> connectionPool;
+	private final PoolableConnection[] pool;
+	private final AtomicLong counter;
+	private final long INITIAL_COUNTER_VALUE = 0L;
+	private static final long EMPTY_OWNER_VALUE = -1L;
 	
-	private int maxPoolSize;
-	AtomicInteger currentPoolSize; 
-	
-	public ConnectionPool( int p_initialPoolSize, int p_maxPoolSize ) {
-		if ( p_maxPoolSize < p_initialPoolSize || p_initialPoolSize < 0 || p_maxPoolSize < 1 ) {
-			throw new IllegalArgumentException("blarg");
-		}
-		maxPoolSize = p_maxPoolSize;
-		currentPoolSize = new AtomicInteger(0);
-		connectionPool = new LinkedBlockingQueue<PoolableConnection>( p_maxPoolSize );		
+	public ConnectionPool( int p_capacity ) {
 		
-		for ( int count = 0; count < p_initialPoolSize; count++ ) {
-			addConnection();
+		counter = new AtomicLong( INITIAL_COUNTER_VALUE );
+		
+		pool = new PoolableConnection[p_capacity];
+		
+		for ( int i = 0; i < p_capacity; i++ ) {
+			pool[i] = createPoolableConnection();
 		}
 	}
 	
-	/**
-	 * Request a connection from the pool.
-	 * <p>
-	 * If an idling connection exists, return this. If no idle connection, the pool creates a new connection and returns it.
-	 * 
-	 * @return
-	 * @throws InterruptedException
-	 */
-	//TODO handle Case: no idle connections and pool already at max capacity.
-	public PoolableConnection requestConnection() throws InterruptedException {
+	public PoolableConnection getConnection() {
 		
-		PoolableConnection connection = null;
+		PoolableConnection returnConnection = null;
 		
-		synchronized( connectionPool ) {
-			if ( connectionPool.peek() != null ) {
-				connection = connectionPool.take();
-			} else {
-				if ( currentPoolSize.get() < maxPoolSize ) {
-					addConnection();
-					connection = connectionPool.take();
+		long ticket = counter.getAndIncrement();
+		boolean success = false;
+		
+		while ( success == false ) {
+			for ( PoolableConnection connection : pool ) {
+				if ( connection.compareAndSet(ticket) ) {
+					returnConnection = connection;
+					success = true;
+					break;
 				}
 			}
 		}
-		return connection;
+		
+		return returnConnection;
+		
 	}
-	
-	private void addConnection() {
+
+	private PoolableConnection createPoolableConnection() {
+		Connection connection;
+		
 		try {
-			Connection l_connection = DriverManager.getConnection("jdbc:sqlite:marketToolDB.db");
-			connectionPool.offer( new PoolableConnection( l_connection, this ) );
-			currentPoolSize.incrementAndGet();
+			connection = DriverManager.getConnection("jdbc:sqlite:marketToolDB.db");
 		} catch (SQLException e) {
 			throw new RuntimeException("error creating database connection");
 		}
-	}
-	
-	/**
-	 * Return the connection to this pool.
-	 * <br>
-	 * Should only be called from a connection, and should have package access only or any connection could be returned to any pool.
-	 * 
-	 * @param p_connection the connection to return.
-	 */
-	protected void returnConnection( PoolableConnection p_connection ) {
-		connectionPool.add(p_connection);
-	}
-	
-	private void closeConnection ( PoolableConnection p_connection ) {
-		p_connection.destroy();
-		currentPoolSize.decrementAndGet();
+		
+		return new PoolableConnection( connection );
 	}
 	
 }
