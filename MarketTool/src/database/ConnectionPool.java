@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.LockSupport;
 
 public class ConnectionPool {
 	
@@ -23,7 +24,7 @@ public class ConnectionPool {
 		}
 	}
 	
-	public PoolableConnection getConnection() {
+	public PoolableConnection getConnectionBusySpin() {
 		
 		PoolableConnection returnConnection = null;
 		
@@ -39,6 +40,32 @@ public class ConnectionPool {
 				}
 			}
 		}
+		
+		return returnConnection;
+		
+	}
+	
+	public PoolableConnection getConnectionSpinWait() {
+		
+		PoolableConnection returnConnection = null;
+		
+		long ticket = counter.getAndIncrement();
+		boolean success = false;		
+		
+		OuterLabel:
+		while ( success == false ) {
+			for ( int i = 0; i < 5; i++ ) {
+				for ( PoolableConnection connection : pool ) {
+					if ( connection.compareAndSet(ticket) ) {
+						returnConnection = connection;
+						break OuterLabel;
+					}
+				}
+			}
+			
+			LockSupport.parkNanos(1);
+		}
+
 		
 		return returnConnection;
 		

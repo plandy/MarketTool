@@ -7,7 +7,7 @@ public enum ConnectionManager {
 	private final ConnectionPool connectionPool = new ConnectionPool( 3 );
 	
 	public PoolableConnection getConnection() {
-		return connectionPool.getConnection();
+		return connectionPool.getConnectionSpinWait();
 	}
 
 }
