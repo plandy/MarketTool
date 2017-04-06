@@ -41,5 +41,24 @@ public class DatabaseFacade extends AbstractFacade {
 			connection.returnToPool();
 		}
 	}
+
+	public boolean isDatabaseInitialized() {
+
+		boolean isInitialized = false;
+
+		PoolableConnection connection = getDatabaseConnection();
+		DatabaseService databaseService = new DatabaseService();
+
+		try {
+			isInitialized = databaseService.isDatabaseInitialized( connection );
+		} catch (SQLException e) {
+			throw new RuntimeException();
+		} finally {
+			connection.returnToPool();
+		}
+
+
+		return isInitialized;
+	}
 	
 }

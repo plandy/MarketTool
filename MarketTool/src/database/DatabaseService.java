@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import applicationConstants.InitialListedStocks;
 import database.sqlite.Tables;
 import database.sqlite.procedures.ProcedureDefinitions;
+import database.sqlite.procedures.ProcedureImplementations;
 import priceHistory.ListedStockTO;
 
 public class DatabaseService {
@@ -35,6 +36,15 @@ public class DatabaseService {
 			prepstatement.addBatch();
 		}
 		int[] results = prepstatement.executeBatch();
+	}
+
+	public boolean isDatabaseInitialized( Connection p_connection ) throws SQLException {
+
+		ProcedureImplementations databaseProc = new ProcedureImplementations();
+
+		boolean isInitialized = databaseProc.isTableExists( Tables.TABLE_LISTEDSTOCKS, p_connection );
+
+		return isInitialized;
 	}
 	
 }

@@ -48,4 +48,6 @@ public class ProcedureDefinitions {
 	
 	public static final String GET_MOSTRECENT_DATAREQUEST_DATE = "select max(REQUESTDATE) as REQUESTDATE from DATAREQUESTHISTORY where TICKER = ? ";
 
+	public static final String IS_TABLE_EXISTS = "select 1 from SQLITE_MASTER where TYPE = 'table' and NAME = ? collate nocase";
+
 }

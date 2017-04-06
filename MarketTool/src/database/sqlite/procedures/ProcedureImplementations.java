@@ -162,4 +162,16 @@ public class ProcedureImplementations {
 		
 		return listedStocks;
 	}
+
+	public boolean isTableExists( String p_tableName, Connection p_connection ) throws SQLException {
+		boolean isExists = false;
+
+		PreparedStatement preparedStatement = p_connection.prepareStatement( ProcedureDefinitions.IS_TABLE_EXISTS );
+
+		preparedStatement.setString(1, p_tableName );
+
+		isExists = preparedStatement.execute();
+
+		return isExists;
+	}
 }
