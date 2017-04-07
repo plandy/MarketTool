@@ -170,7 +170,10 @@ public class ProcedureImplementations {
 
 		preparedStatement.setString(1, p_tableName );
 
-		isExists = preparedStatement.execute();
+		ResultSet result = preparedStatement.executeQuery();
+		while ( result.next() ) {
+			isExists = result.getBoolean(1);
+		}
 
 		return isExists;
 	}

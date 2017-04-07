@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import utility.SystemInformationUtility;
 import view.menuBar.TopMenuBar;
 import view.priceHistory.PriceHistoryMainView;
+import database.DatabaseFacade;
 
 public class Root extends Application {
 	
@@ -16,6 +17,8 @@ public class Root extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+
+		initializeDatabase();
 		
 		primaryStage.setTitle( StringConstants.APPLICATION_TITLE );
 		initializeApplicationWindow( primaryStage );
@@ -43,6 +46,21 @@ public class Root extends Application {
 		primaryStage.setWidth( l_screenWidth );
 		primaryStage.setHeight( l_screenHeight );
 		
-	}	
+	}
+
+	private void initializeDatabase() {
+
+		DatabaseFacade dbFacade = new DatabaseFacade();
+
+		if ( dbFacade.isDatabaseInitialized() == false ) {
+			dbFacade.initialiseDatabase();
+		}
+
+		if ( dbFacade.isDatabaseInitialized() == false ) {
+			throw new RuntimeException( "Unable to initialize database" );
+		}
+	}
+
+
 	
 }
