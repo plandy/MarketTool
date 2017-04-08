@@ -29,7 +29,7 @@ public class BackgroundDataFeedService {
 	
 	private class DataRequestRunnable implements Runnable {
 		
-		volatile boolean l_interrupt = false;
+		private volatile boolean l_interrupt = false;
 
 		@Override
 		public void run() {
@@ -45,7 +45,7 @@ public class BackgroundDataFeedService {
 			
 		}
 		
-		public void stop() {
+		private void stop() {
 			l_interrupt = true;
 		}
 		

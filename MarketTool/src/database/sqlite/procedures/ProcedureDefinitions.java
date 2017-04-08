@@ -10,7 +10,7 @@ public class ProcedureDefinitions {
 			+ "FULLNAME "
 			+ "from LISTEDSTOCKS";
 	
-	public static final String I_PRICEHISTORY = "insert into PRICEHISTORY "
+	public static final String I_PRICEHISTORY = "insert or ignore into PRICEHISTORY "
 			+ "(TICKER, "
 			+ "DATE, "
 			+ "OPENPRICE, "
