@@ -7,6 +7,7 @@ public class Tables {
 	public static final String CREATE_LISTEDSTOCKS = "create table LISTEDSTOCKS "
 			+ "(TICKER string not null, "
 			+ "FULLNAME string not null, "
+			+ "FLAGWATCHED boolean not null, "
 			+ "primary key (TICKER) )";
 
 	public static final String TABLE_PRICEHISTORY = "PRICEHISTORY";

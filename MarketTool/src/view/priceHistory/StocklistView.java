@@ -3,6 +3,7 @@ package view.priceHistory;
 import applicationConstants.StringConstants;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
@@ -38,6 +39,20 @@ public class StocklistView extends TabPane {
 	
 	public void populateStockList( ObservableList<ListedStockTO> p_observableList ) {
 		stocklistListView.setItems( p_observableList );
+		populateWatchList( p_observableList );
+	}
+
+	private void populateWatchList( ObservableList<ListedStockTO> p_stockList ) {
+
+		ObservableList<ListedStockTO> watchlist = FXCollections.observableArrayList();
+
+		for ( ListedStockTO stockTO : p_stockList ) {
+			if ( stockTO.isWatchlisted() == true ) {
+				watchlist.add( stockTO );
+			}
+		}
+
+		watchlistListView.setItems( watchlist );
 	}
 	
 	private void createChildTabs() {
@@ -89,7 +104,10 @@ public class StocklistView extends TabPane {
 			ContextMenu contextMenu = new ContextMenu();
 			MenuItem addToWatchlistItem = new MenuItem();
 			addToWatchlistItem.setText( StringConstants.PRICEHISTORYVIEW_ADDTOWATCHLIST );
-			addToWatchlistItem.setOnAction( event -> watchlistListView.getItems().add(cell.getItem()) );
+			addToWatchlistItem.setOnAction( event -> {
+				watchlistListView.getItems().add( cell.getItem() );
+				addToWatchListAction( cell.getItem() );
+			} );
 			contextMenu.getItems().add( addToWatchlistItem );
 			
 			cell.emptyProperty().addListener( (observableValue, oldIsEmpty, newIsEmpty) -> {
@@ -117,8 +135,53 @@ public class StocklistView extends TabPane {
 		
 		stocklistListView.getSelectionModel().selectedItemProperty().addListener( new StockSelectionListener() );
 	}
+
+	private void addToWatchListAction( ListedStockTO p_stockTO ) {
+		controller.updateWatchlistStatus( p_stockTO, true);
+	}
+
+	private void removeFromWatchListAction( ListedStockTO p_stockTO ) {
+		controller.updateWatchlistStatus( p_stockTO, false);
+	}
 	
 	private void addWatchListListeners() {
+		watchlistListView.setCellFactory( factory -> {
+			ListCell<ListedStockTO> cell = new ListCell();
+
+			cell.textProperty().bind(cell.itemProperty().asString());
+
+			ContextMenu contextMenu = new ContextMenu();
+			MenuItem removeFromWatchlistItem = new MenuItem();
+			removeFromWatchlistItem.setText( "Remove from watchlist" );
+			removeFromWatchlistItem.setOnAction( event -> {
+				removeFromWatchListAction( cell.getItem() );
+				watchlistListView.getItems().remove( cell.getItem() );
+			} );
+			contextMenu.getItems().add( removeFromWatchlistItem );
+
+			cell.emptyProperty().addListener( (observableValue, oldIsEmpty, newIsEmpty) -> {
+				if ( newIsEmpty ) {
+					cell.setContextMenu( null );
+				} else {
+					cell.setContextMenu( contextMenu );
+				}
+			});
+
+			cell.addEventFilter(MouseEvent.MOUSE_RELEASED, e -> {
+				if ( e.getButton() == MouseButton.SECONDARY ) {
+					e.consume();
+				}
+			});
+
+			cell.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+				if ( e.getButton() == MouseButton.SECONDARY ) {
+					e.consume();
+				}
+			});
+
+			return cell;
+		});
+
 		watchlistListView.getSelectionModel().selectedItemProperty().addListener( new StockSelectionListener() );
 	}
 	

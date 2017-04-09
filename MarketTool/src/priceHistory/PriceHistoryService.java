@@ -71,5 +71,9 @@ public class PriceHistoryService {
 	public List<ListedStockTO> getInitialListedStocks() {
 		return InitialListedStocks.listedStocks;
 	}
+
+	public void updateWatchlist(  ListedStockTO p_stock, PoolableConnection p_connection ) throws SQLException {
+		databaseProc.updateWatchlistedStocks( p_stock, p_connection );
+	}
 	
 }

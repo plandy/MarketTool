@@ -3,12 +3,16 @@ package database.sqlite.procedures;
 public class ProcedureDefinitions {
 	public static final String I_LISTEDSTOCKS = "insert into LISTEDSTOCKS "
 			+ "(TICKER, "
-			+ "FULLNAME) "
-			+ "values (?, ?)";
-	
+			+ "FULLNAME,"
+			+ "FLAGWATCHED) "
+			+ "values (?, ?, 0)";
+
 	public static final String GET_ALL_LISTEDSTOCKS = "select TICKER, "
-			+ "FULLNAME "
+			+ "FULLNAME,"
+			+ "FLAGWATCHED "
 			+ "from LISTEDSTOCKS";
+
+	public static final String U_WATCHLIST = "update LISTEDSTOCKS set FLAGWATCHED = ? where TICKER = ?";
 	
 	public static final String I_PRICEHISTORY = "insert or ignore into PRICEHISTORY "
 			+ "(TICKER, "

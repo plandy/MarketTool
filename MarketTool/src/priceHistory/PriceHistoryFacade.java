@@ -89,4 +89,22 @@ public class PriceHistoryFacade extends AbstractFacade {
 		}
 	}
 
+	public void updateWatchlist( ListedStockTO p_stock ) {
+		PoolableConnection poolableConnection = getDatabaseConnection();
+
+		try {
+			poolableConnection.beginTransaction();
+
+			PriceHistoryService priceHistoryService = new PriceHistoryService();
+			priceHistoryService.updateWatchlist( p_stock, poolableConnection );
+
+			poolableConnection.commitTransaction();
+		} catch ( SQLException e ) {
+			poolableConnection.silentRollback();
+			throw new RuntimeException();
+		} finally {
+			poolableConnection.returnToPool();
+		}
+	}
+
 }

@@ -156,7 +156,7 @@ public class ProcedureImplementations {
 		ResultSet results = preparedStatement.executeQuery();
 		
 		while ( results.next() ) {
-			ListedStockTO stockTO = new ListedStockTO( results.getString("TICKER"), results.getString("FULLNAME") );
+			ListedStockTO stockTO = new ListedStockTO( results.getString("TICKER"), results.getString("FULLNAME"), results.getBoolean("FLAGWATCHED") );
 			listedStocks.add( stockTO );
 		}
 		
@@ -176,5 +176,18 @@ public class ProcedureImplementations {
 		}
 
 		return isExists;
+	}
+
+	public void updateWatchlistedStocks( ListedStockTO p_stock, Connection p_connection ) throws SQLException {
+
+		PreparedStatement preparedStatement = p_connection.prepareStatement( ProcedureDefinitions.U_WATCHLIST );
+
+		preparedStatement.setBoolean(1, p_stock.isWatchlisted() );
+		preparedStatement.setString(2, p_stock.getTicker() );
+
+		preparedStatement.addBatch();
+
+		int[] results = preparedStatement.executeBatch();
+
 	}
 }

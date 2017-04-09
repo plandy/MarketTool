@@ -188,4 +188,9 @@ public class PriceHistoryController {
 		}
 	}
 
+	public void updateWatchlistStatus( ListedStockTO p_stockTO, boolean p_isWatchlisted ) {
+		p_stockTO.setIsWatchListed( p_isWatchlisted );
+		service.updateWatchlist( p_stockTO );
+	}
+
 }
