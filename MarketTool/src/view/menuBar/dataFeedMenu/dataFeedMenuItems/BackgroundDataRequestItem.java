@@ -6,7 +6,7 @@ import priceHistory.dataFeed.backgroundService.BackgroundDataFeedService;
 
 public class BackgroundDataRequestItem extends CheckMenuItem {
 	
-	BackgroundDataFeedService backgroundDataService;
+	private BackgroundDataFeedService backgroundDataService;
 	
 	public BackgroundDataRequestItem() {
 		super( StringConstants.DATAFEED_BACKGROUNDREQUESTS_TITLE );

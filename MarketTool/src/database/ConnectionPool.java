@@ -1,5 +1,7 @@
 package database;
 
+import org.sqlite.SQLiteConfig;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,6 +20,9 @@ public class ConnectionPool {
 		counter = new AtomicLong( INITIAL_COUNTER_VALUE );
 		
 		pool = new PoolableConnection[p_capacity];
+
+		SQLiteConfig config = new SQLiteConfig();
+		config.setJournalMode( SQLiteConfig.JournalMode.WAL );
 		
 		for ( int i = 0; i < p_capacity; i++ ) {
 			pool[i] = createPoolableConnection();
