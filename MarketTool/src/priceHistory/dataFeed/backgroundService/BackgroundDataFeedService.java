@@ -47,7 +47,7 @@ public class BackgroundDataFeedService {
 				if ( l_interrupt == true ) {
 					break;
 				}
-				priceHistoryFacade.getHistoryFromDataFeed( stock.getTicker() );
+				//priceHistoryFacade.getHistoryFromDataFeed( stock.getTicker() );
 				LockSupport.parkNanos( FIFTY_MILLIS );
 			}
 			

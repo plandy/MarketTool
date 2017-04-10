@@ -30,9 +30,6 @@ public class ProcedureImplementations {
 				mostRecentDate = DateUtility.parseStringToDate( results.getString("REQUESTDATE") );
 			}
 		}
-		if ( mostRecentDate == null ) {
-			mostRecentDate = new Date(0);
-		}
 		
 		return mostRecentDate;
 	}

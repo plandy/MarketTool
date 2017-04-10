@@ -2,10 +2,14 @@ package priceHistory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import database.PoolableConnection;
+import priceHistory.dataFeed.DataFeedTO;
 import priceHistory.dataFeed.PriceHistoryTO;
+import priceHistory.dataFeed.yahooFinance.YahooDataRequest;
+import utility.DateUtility;
 
 public class PriceHistoryFacade extends AbstractFacade {
 	
@@ -71,14 +75,15 @@ public class PriceHistoryFacade extends AbstractFacade {
 		return listedStocks;
 	}
 	
-	public void getHistoryFromDataFeed( String p_ticker ) {
+	public List<DataFeedTO> getHistoryFromDataFeed( String p_ticker ) {
 		PoolableConnection poolableConnection = getDatabaseConnection();
+		List<DataFeedTO> history;
 		
 		try {
 			poolableConnection.beginTransaction();
 			
 			PriceHistoryService priceHistoryService = new PriceHistoryService();
-			priceHistoryService.getHistoryFromDataFeed( p_ticker, poolableConnection );
+			history = priceHistoryService.getMissingHistoryFromDataFeed( p_ticker, poolableConnection );
 			
 			poolableConnection.commitTransaction();
 		} catch ( SQLException e ) {
@@ -87,6 +92,8 @@ public class PriceHistoryFacade extends AbstractFacade {
 		} finally {
 			poolableConnection.returnToPool();
 		}
+
+		return history;
 	}
 
 	public void updateWatchlist( ListedStockTO p_stock ) {
@@ -96,15 +103,58 @@ public class PriceHistoryFacade extends AbstractFacade {
 			poolableConnection.beginTransaction();
 
 			PriceHistoryService priceHistoryService = new PriceHistoryService();
-			priceHistoryService.updateWatchlist( p_stock, poolableConnection );
+			priceHistoryService.updateWatchlist(p_stock, poolableConnection);
 
 			poolableConnection.commitTransaction();
-		} catch ( SQLException e ) {
+		} catch (SQLException e) {
 			poolableConnection.silentRollback();
 			throw new RuntimeException();
 		} finally {
 			poolableConnection.returnToPool();
 		}
+	}
+
+	public List<DataFeedTO> getMissingHistoryFromDataFeed( String p_ticker ) {
+		List<DataFeedTO> missingHistory;
+
+		PoolableConnection poolableConnection = getDatabaseConnection();
+		PriceHistoryService priceHistoryService = new PriceHistoryService();
+
+		Date mostRecentPriceDate = null;
+		Date mostRecentRequestDate = null;
+
+		try {
+			mostRecentPriceDate = priceHistoryService.getMostRecentPricehistoryDate( p_ticker, poolableConnection );
+			mostRecentRequestDate = priceHistoryService.getMostRecentRequestDate( p_ticker, poolableConnection );
+		} catch ( SQLException e ) {
+			throw new RuntimeException();
+		} finally {
+			poolableConnection.returnToPool();
+		}
+
+		missingHistory = priceHistoryService.getMissingHistoryFromDataFeed( p_ticker, mostRecentPriceDate, mostRecentRequestDate );
+
+		return missingHistory;
+	}
+
+	public void insertPriceHistory( String p_ticker, List<DataFeedTO> p_history ) {
+		PoolableConnection poolableConnection = getDatabaseConnection();
+		PriceHistoryService priceHistoryService = new PriceHistoryService();
+
+		try{
+			poolableConnection.beginTransaction();
+
+			priceHistoryService.insertPriceHistory( p_ticker, p_history, poolableConnection );
+			priceHistoryService.insertDataRequestHistory( p_ticker, DateUtility.getTodayDate(), poolableConnection );
+
+			poolableConnection.commitTransaction();
+		} catch (SQLException e) {
+			poolableConnection.silentRollback();
+			throw new RuntimeException();
+		} finally {
+			poolableConnection.returnToPool();
+		}
+
 	}
 
 }
