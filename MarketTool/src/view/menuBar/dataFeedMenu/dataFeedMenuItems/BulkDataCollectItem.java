@@ -1,15 +1,16 @@
 package view.menuBar.dataFeedMenu.dataFeedMenuItems;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.VBoxBuilder;
-import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import priceHistory.ListedStockTO;
 import priceHistory.PriceHistoryFacade;
 import priceHistory.dataFeed.DataFeedTO;
@@ -20,36 +21,50 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class BulkDataCollectItem extends MenuItem {
 
-    public BulkDataCollectItem() {
+    final Stage myDialog;
+    ProgressBar progressBar;
+
+
+    public BulkDataCollectItem( MenuBar p_parentMenuBar ) {
         super( "Bulk collect data" );
+
+        myDialog = new Stage();
+        myDialog.initModality(Modality.APPLICATION_MODAL);
+
         this.setOnAction( new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
                 BulkDataCollectionOrchestrator bulkDataCollector = new BulkDataCollectionOrchestrator(3);
-                bulkDataCollector.start();
+                progressBar = new ProgressBar(0);
 
-                final Stage myDialog = new Stage();
-                myDialog.initModality(Modality.APPLICATION_MODAL);
+                VBox dialogWindow = new VBox();
+                dialogWindow.getChildren().add(progressBar);
 
-                ProgressBar progressBar = new ProgressBar(0);
+                Scene dialogScene = new Scene(dialogWindow);
 
-                Scene myDialogScene = new Scene(VBoxBuilder.create()
-                        .children(new Text("getting data"), progressBar)
-                        .alignment(Pos.CENTER)
-                        .build());
+                Window sourceWindow = p_parentMenuBar.getScene().getWindow();
+                myDialog.initOwner( sourceWindow );
 
-                myDialog.setScene(myDialogScene);
+                myDialog.setScene(dialogScene);
                 myDialog.show();
 
-                while( bulkDataCollector.isFinished() == false ) {
-                    progressBar.setProgress( 5 );
-                }
+                bulkDataCollector.start();
+            }
+        });
 
-                myDialog.close();
+    }
+
+    public void updateProgress( int p_progress, int p_totalJobs) {
+        Platform.runLater(() -> {
+            if ( p_progress > 0 ) {
+                progressBar.setProgress( 100 * ( 1 - (p_progress / p_totalJobs) ) );
+            } else {
+                progressBar.setProgress( 100 );
             }
 
-        });
+        }  );
+
     }
 
     public class BulkDataCollectionOrchestrator extends Thread {
@@ -113,6 +128,7 @@ public class BulkDataCollectItem extends MenuItem {
 
                 if ( job.isEmpty() == false ) {
                     facade.insertPriceHistory( job.get(0).getTicker(), job );
+                    updateProgress( numJobsRemaining, stocks.size() );
                 }
 
                 numJobsRemaining--;

@@ -12,6 +12,6 @@ public class TopMenuBar extends MenuBar {
 		
 		this.getMenus().add( new FileMenu() );
 		this.getMenus().add( new DatabaseMenu() );
-		this.getMenus().add( new DataFeedMenu() );
+		this.getMenus().add( new DataFeedMenu( this ) );
 	}
 }
