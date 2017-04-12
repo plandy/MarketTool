@@ -1,19 +1,13 @@
 package view.menuBar.dataFeedMenu.dataFeedMenuItems;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 import priceHistory.ListedStockTO;
 import priceHistory.PriceHistoryFacade;
 import priceHistory.dataFeed.DataFeedTO;
+import view.ProgressBlockingPopup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,33 +15,20 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class BulkDataCollectItem extends MenuItem {
 
-    final Stage myDialog;
-    ProgressBar progressBar;
+    private ProgressBlockingPopup progressPopup;
 
 
     public BulkDataCollectItem( MenuBar p_parentMenuBar ) {
         super( "Bulk collect data" );
-
-        myDialog = new Stage();
-        myDialog.initModality(Modality.APPLICATION_MODAL);
 
         this.setOnAction( new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
                 BulkDataCollectionOrchestrator bulkDataCollector = new BulkDataCollectionOrchestrator(3);
-                progressBar = new ProgressBar(0);
 
-                VBox dialogWindow = new VBox();
-                dialogWindow.getChildren().add(progressBar);
-
-                Scene dialogScene = new Scene(dialogWindow);
-
-                Window sourceWindow = p_parentMenuBar.getScene().getWindow();
-                myDialog.initOwner( sourceWindow );
-
-                myDialog.setScene(dialogScene);
-                myDialog.show();
+                progressPopup = new ProgressBlockingPopup( p_parentMenuBar.getScene().getWindow() );
+                progressPopup.show();
 
                 bulkDataCollector.start();
             }
@@ -56,15 +37,7 @@ public class BulkDataCollectItem extends MenuItem {
     }
 
     public void updateProgress( int p_progress, int p_totalJobs) {
-        Platform.runLater(() -> {
-            if ( p_progress > 0 ) {
-                progressBar.setProgress( 100 * ( 1 - (p_progress / p_totalJobs) ) );
-            } else {
-                progressBar.setProgress( 100 );
-            }
-
-        }  );
-
+        progressPopup.updateProgress( p_progress, p_totalJobs );
     }
 
     public class BulkDataCollectionOrchestrator extends Thread {
