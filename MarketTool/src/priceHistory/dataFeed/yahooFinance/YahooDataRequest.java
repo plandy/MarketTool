@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Duration;
@@ -104,12 +105,13 @@ public class YahooDataRequest {
 //			 */
 
 			URL l_url = null;
-			l_url = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ p_ticker + beginDateURL+ endDateURL +"g=d&ignore=.csv");
+			l_url = new URL("https://ichart.finance.yahoo.com/table.csv?s="+ p_ticker + beginDateURL+ endDateURL +"g=d&ignore=.csv");
 			
 			Log.info( "Yahoo Data request: " + p_ticker + DateUtility.parseDateToString( p_beginDate ) + DateUtility.parseDateToString( p_endDate ) );
 			Instant start = Instant.now();
 			
 			URLConnection l_connection = l_url.openConnection();
+			((HttpURLConnection) l_connection).getResponseCode();
 			InputStreamReader l_stream = new InputStreamReader( l_connection.getInputStream() );
 			
 			Instant end = Instant.now();
