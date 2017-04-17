@@ -1,5 +1,6 @@
 package view.menuBar.dataFeedMenu.dataFeedMenuItems;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuBar;
@@ -36,18 +37,12 @@ public class BulkDataCollectItem extends MenuItem {
 
     }
 
-    public void updateProgress( int p_progress, int p_totalJobs) {
-        progressPopup.updateProgress( p_progress, p_totalJobs );
-    }
-
     public class BulkDataCollectionOrchestrator extends Thread {
 
         private final List<ListedStockTO> stocks;
         private final List<List<ListedStockTO>> listOfJobs;
         private final List<BulkDataCollectionWorker> workers;
         private final ArrayBlockingQueue<List<DataFeedTO>>listDataToBeInserted;
-
-        private volatile int numJobsRemaining;
 
         public BulkDataCollectionOrchestrator( int p_numWorkers ) {
             stocks = new PriceHistoryFacade().getListedStocks();
@@ -70,17 +65,23 @@ public class BulkDataCollectItem extends MenuItem {
                 workers.add( worker );
             }
 
-            numJobsRemaining = stocks.size();
-
         }
 
         private void SQLITE_ISNT_FOR_CONCURRENT_ACCESS() {
             while ( listDataToBeInserted.size() < stocks.size() ) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                updateProgress1();
             }
         }
 
         @Override
         public void run() {
+
+            int numInsertsRemaining = stocks.size();
 
             for ( BulkDataCollectionWorker worker : workers ) {
                 worker.start();
@@ -90,8 +91,7 @@ public class BulkDataCollectItem extends MenuItem {
 
             SQLITE_ISNT_FOR_CONCURRENT_ACCESS();
 
-            while ( numJobsRemaining > 0 ) {
-
+            while ( numInsertsRemaining > 0 ) {
                 List<DataFeedTO> job = null;
                 try {
                     job = listDataToBeInserted.take();
@@ -101,12 +101,19 @@ public class BulkDataCollectItem extends MenuItem {
 
                 if ( job.isEmpty() == false ) {
                     facade.insertPriceHistory( job.get(0).getTicker(), job );
-                    updateProgress( numJobsRemaining, stocks.size() );
+                    updateProgress2( numInsertsRemaining );
                 }
 
-                numJobsRemaining--;
-
+                numInsertsRemaining--;
             }
+
+            finish();
+        }
+
+        private void finish() {
+            Platform.runLater(() -> {
+                progressPopup.close();
+            });
         }
 
         public void workerOnFinishJob( List<DataFeedTO> p_dataToInsert ) {
@@ -117,14 +124,24 @@ public class BulkDataCollectItem extends MenuItem {
             }
         }
 
-        public boolean isFinished() {
+        private static final int DATAFEEDACCESS_COST = 10;
+        private static final int DATABASEINSERT_COST = 1;
 
-            boolean isFinished = false;
+        private void updateProgress1() {
+            double workEstimate = ( stocks.size() * DATAFEEDACCESS_COST ) + ( stocks.size() * DATABASEINSERT_COST );
+            double currentWorkDone = listDataToBeInserted.size() * DATAFEEDACCESS_COST;
+            double progress = currentWorkDone / workEstimate;
 
-            isFinished = ( numJobsRemaining == 0 );
+            progressPopup.updateProgress( progress );
+            System.out.println("Update Progress 1");
+        }
 
-            return isFinished;
+        private void updateProgress2( int p_numInsertsRemaining ) {
+            double workEstimate = ( stocks.size() * DATAFEEDACCESS_COST ) + ( stocks.size() * DATABASEINSERT_COST );
+            double currentWorkDone = ( stocks.size() * DATAFEEDACCESS_COST ) + ( (stocks.size() - p_numInsertsRemaining) * DATABASEINSERT_COST );
+            double progress = currentWorkDone / workEstimate;
 
+            progressPopup.updateProgress( progress );
         }
 
     }

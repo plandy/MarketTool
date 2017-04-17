@@ -27,13 +27,9 @@ public class ProgressBlockingPopup extends Stage {
 
     }
 
-    public void updateProgress( int p_progress, int p_totalJobs) {
+    public void updateProgress( double p_progress ) {
         Platform.runLater(() -> {
-            if ( p_progress > 0 ) {
-                progressBar.setProgress( 100 * ( 1 - (p_progress / p_totalJobs) ) );
-            } else {
-                progressBar.setProgress( 100 );
-            }
+            progressBar.setProgress( p_progress );
         });
     }
 
